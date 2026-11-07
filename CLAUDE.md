@@ -22,7 +22,7 @@ chatgpt.com content script (ChatGptAdapter) -> background service worker -> Java
 ### Monorepo layout
 ```
 /extension   WXT + TypeScript + Preact, Manifest V3
-/api         Java 21, Spring Boot 3, JdbcTemplate, Flyway, Maven
+/api         Java 25, Spring Boot 4, JdbcTemplate, Flyway, Maven
 /db          seed data (JSON/CSV) + seeding scripts
 docker-compose.yml   pgvector/pgvector:pg16 + api
 ```

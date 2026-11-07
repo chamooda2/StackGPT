@@ -18,6 +18,28 @@ pnpm test                       # synthetic-attempt generator tests
 
 Reset everything: `docker compose down -v`.
 
+## API (build step 2)
+
+Requires JDK 25 (Maven comes via the wrapper). Listens on port 8080.
+
+```sh
+cd api
+./mvnw spring-boot:run          # Windows: .\mvnw.cmd spring-boot:run
+./mvnw test                     # unit tests + retrieval eval (eval skips if the DB isn't seeded/backfilled)
+```
+
+On startup and every 30 s the API backfills `embedding` / `error_sigs` (and `env` where empty) for
+rows the seed left blank, using the in-process bge-small-en-v1.5 model.
+
+```sh
+curl -X POST localhost:8080/v1/verify -H 'Content-Type: application/json' \
+  -d '{"platform":"chatgpt","question":"pip install says error: externally-managed-environment on Ubuntu 24.04"}'
+```
+
+Returns the extracted query (statement, error signatures, env facets merged with `envHints`) and
+the top 10 problems fused by RRF from vector, full-text and error-signature search, each with its
+per-list ranks, cosine similarity, solutions and raw attempt counts (synthetic ones counted separately).
+
 ## Seed data
 
 - `db/seed/curated/*.json`: hand-curated problems and solutions for both pilot domains
