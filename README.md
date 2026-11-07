@@ -36,7 +36,28 @@ curl -X POST localhost:8080/v1/verify -H 'Content-Type: application/json' \
   -d '{"platform":"chatgpt","question":"pip install says error: externally-managed-environment on Ubuntu 24.04"}'
 ```
 
-Returns the extracted query (statement, error signatures, env facets merged with `envHints`) and
+## Extension (build step 3)
+
+WXT + Preact, Manifest V3, content script on `https://chatgpt.com/*`.
+
+```sh
+cd extension && pnpm install
+pnpm build                      # -> extension/.output/chrome-mv3
+pnpm test                       # adapter fixture test, completion detection, panel
+pnpm dev                        # Chrome with the extension loaded and hot reload
+```
+
+Load manually: `chrome://extensions` → Developer mode → **Load unpacked** → `extension/.output/chrome-mv3`.
+With the API running, open a ChatGPT conversation: each finished answer gets a **Check with StackGPT**
+badge. Nothing is sent until you click it; the background worker then calls the API and the panel
+shows the raw matches. To use another API URL, build with `WXT_API_BASE=http://host:port` set in the
+shell (the manifest's host permission follows it).
+
+All chatgpt.com DOM assumptions live in `extension/src/lib/chatgpt.ts`.
+
+### API response
+
+`/v1/verify` returns the extracted query (statement, error signatures, env facets merged with `envHints`) and
 the top 10 problems fused by RRF from vector, full-text and error-signature search, each with its
 per-list ranks, cosine similarity, solutions and raw attempt counts (synthetic ones counted separately).
 

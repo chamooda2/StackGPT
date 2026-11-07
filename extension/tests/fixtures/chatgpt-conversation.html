@@ -1,0 +1,61 @@
+<!--
+  Hand-built fixture following the chatgpt.com DOM contract in CLAUDE.md (message roles, ids, model slug,
+  .markdown content, language-* code classes, a slug-less "Thinking" pseudo-message). Class soup trimmed.
+  Replace or extend with a saved snapshot of a real conversation when the live markup drifts.
+-->
+<main>
+  <article data-testid="conversation-turn-1">
+    <h5 class="sr-only">You said:</h5>
+    <div data-message-author-role="user" data-message-id="u1">
+      <div class="whitespace-pre-wrap">pip install fails on Ubuntu 24.04 with
+error: externally-managed-environment</div>
+    </div>
+  </article>
+
+  <article data-testid="conversation-turn-2">
+    <h6 class="sr-only">ChatGPT said:</h6>
+    <div data-message-author-role="assistant" data-message-id="a0">
+      <div class="text-token-text-secondary">Thinking…</div>
+    </div>
+    <div data-message-author-role="assistant" data-message-id="a1" data-message-model-slug="gpt-5">
+      <div class="markdown prose dark:prose-invert w-full break-words">
+        <p>This error comes from <strong>PEP 668</strong>: Ubuntu marks the system Python as managed by apt.</p>
+        <ol>
+          <li><p>Install the venv module:</p>
+            <pre class="overflow-visible!"><div class="contain-inline-size rounded-md"><div class="flex items-center px-4 py-2 text-xs">bash</div><div class="sticky top-9"><button class="flex gap-1">Copy code</button></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-bash"><span>sudo apt install python3-venv
+</span></code></div></div></pre>
+          </li>
+          <li><p>Create and activate a virtual environment.</p></li>
+          <li><p>Install your package with <code>pip install requests</code>.</p></li>
+        </ol>
+        <pre class="overflow-visible!"><div class="contain-inline-size rounded-md"><div class="flex items-center px-4 py-2 text-xs">bash</div><div class="sticky top-9"><button class="flex gap-1">Copy code</button></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-bash"><span>python3 -m venv .venv
+</span><span>source .venv/bin/activate
+</span></code></div></div></pre>
+        <p>Avoid <code>--break-system-packages</code> unless you know what you are doing.</p>
+      </div>
+    </div>
+  </article>
+
+  <article data-testid="conversation-turn-3">
+    <h5 class="sr-only">You said:</h5>
+    <div data-message-author-role="user" data-message-id="u2">
+      <div class="whitespace-pre-wrap">How do I read a UTF-8 file on Windows without UnicodeDecodeError?</div>
+    </div>
+  </article>
+
+  <article data-testid="conversation-turn-4">
+    <h6 class="sr-only">ChatGPT said:</h6>
+    <div data-message-author-role="assistant" data-message-id="a2" data-message-model-slug="gpt-5">
+      <div class="markdown prose dark:prose-invert w-full break-words">
+        <p>Pass the encoding explicitly:</p>
+        <pre class="overflow-visible!"><div class="contain-inline-size rounded-md"><div class="flex items-center px-4 py-2 text-xs">python</div><div class="sticky top-9"><button class="flex gap-1">Copy code</button></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-python"><span>with open("data.txt", encoding="utf-8") as f:
+</span><span>    text = f.read()
+</span></code></div></div></pre>
+        <ul>
+          <li>Windows defaults to cp1252.</li>
+          <li>Alternatively set <code>PYTHONUTF8=1</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </article>
+</main>

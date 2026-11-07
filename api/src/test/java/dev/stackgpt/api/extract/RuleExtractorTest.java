@@ -42,6 +42,12 @@ class RuleExtractorTest {
 	}
 
 	@Test
+	void pipSlugInline() {
+		var x = ex.extract("pip install fails on Ubuntu 24.04 with error: externally-managed-environment, what now?");
+		assertThat(x.errorSigs()).containsExactly("externally-managed-environment");
+	}
+
+	@Test
 	void messageNormalizationMasksPathsAndNumbers() {
 		var x = ex.extract("java.lang.UnsupportedClassVersionError: com/example/App has been compiled by a more recent version "
 				+ "of the Java Runtime (class file version 65.0), this version of the Java Runtime only recognizes up to 61.0");

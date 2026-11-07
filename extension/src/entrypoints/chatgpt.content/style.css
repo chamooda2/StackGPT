@@ -1,0 +1,77 @@
+:host {
+  --sg-fg: #1f2328;
+  --sg-muted: #59636e;
+  --sg-bg: #ffffff;
+  --sg-border: #d1d9e0;
+  --sg-accent: #0969da;
+  --sg-ok: #1a7f37;
+  --sg-warn: #9a6700;
+  --sg-bad: #cf222e;
+}
+
+/* data-theme mirrors the site's theme (set by the content script), not the OS setting. */
+:host([data-theme='dark']) {
+  --sg-fg: #e6edf3;
+  --sg-muted: #9198a1;
+  --sg-bg: #212121;
+  --sg-border: #3d444d;
+  --sg-accent: #4493f8;
+  --sg-ok: #3fb950;
+  --sg-warn: #d29922;
+  --sg-bad: #f85149;
+}
+
+.sg {
+  font: 13px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--sg-fg);
+  margin: 6px 0 10px;
+}
+
+.sg-badge {
+  display: inline-block;
+  font: inherit;
+  color: var(--sg-fg);
+  background: var(--sg-bg);
+  border: 1px solid var(--sg-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.sg-badge:hover:not(:disabled) { border-color: var(--sg-accent); }
+.sg-badge:disabled { cursor: progress; opacity: 0.7; }
+.sg-err { color: var(--sg-bad); cursor: default; }
+
+.sg-link {
+  font: inherit;
+  background: none;
+  border: 0;
+  color: var(--sg-accent);
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.sg-panel {
+  margin-top: 6px;
+  border: 1px solid var(--sg-border);
+  border-radius: 8px;
+  background: var(--sg-bg);
+  padding: 8px 12px;
+  max-width: 760px;
+}
+
+.sg-match { padding: 8px 0; border-bottom: 1px solid var(--sg-border); }
+.sg-match:last-of-type { border-bottom: 0; }
+.sg-match h3 { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+.sg-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--sg-muted); font-size: 12px; }
+.sg-sol { margin: 6px 0 0 10px; padding-left: 8px; border-left: 2px solid var(--sg-border); }
+.sg-sol p { margin: 0; }
+.sg-out { font-size: 12px; color: var(--sg-muted); }
+.sg-w { color: var(--sg-ok); }
+.sg-p { color: var(--sg-warn); }
+.sg-f { color: var(--sg-bad); }
+.sg-syn { font-style: italic; }
+.sg-src { margin-top: 4px; font-size: 11px; color: var(--sg-muted); }
+.sg-src a { color: var(--sg-accent); }
+.sg-query { margin-top: 6px; font-size: 12px; color: var(--sg-muted); }
+.sg-query summary { cursor: pointer; }

@@ -28,7 +28,8 @@ public class RuleExtractor implements ProblemExtractor {
 	static final Pattern ERR_CODE = Pattern.compile("\\b(ERR_[A-Z0-9_]{3,})\\b");
 	static final Pattern HEX = Pattern.compile("\\b(0x[0-9A-Fa-f]{8})\\b");
 	static final Pattern OPENSSL = Pattern.compile("\\berror:([0-9A-F]{8}):");
-	static final Pattern SLUG = Pattern.compile("(?im)^\\s*error: ([a-z]+(?:-[a-z]+)+)\\s*$");
+	// pip-style codes: "error: externally-managed-environment", on its own line or inline
+	static final Pattern SLUG = Pattern.compile("(?i)\\berror:\\s+([a-z]+(?:-[a-z]+)+)\\b");
 	static final Pattern FATAL = Pattern.compile("(?m)^\\s*fatal: ([^\\n]+)$");
 	static final Pattern DEV_CODE = Pattern.compile("\\(Code (\\d{1,3})\\)");
 	static final Pattern SUPPORT = Pattern.compile("(?i)\\bsupport code:? (\\d{3,4})\\b");
