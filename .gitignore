@@ -6,6 +6,7 @@ dist/
 .wxt/
 *.log
 db/seed/raw/
+demo/out/
 # Live DOM dumps from real conversations (private); distil them into hand-trimmed fixtures instead.
 extension/tests/fixtures/live-dump*.json
 .idea/

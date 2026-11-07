@@ -2,6 +2,51 @@
 
 Community verification layer for AI answers (PoC). See [CLAUDE.md](CLAUDE.md) for the design.
 
+Under each finished ChatGPT answer, StackGPT adds a **Check this answer** badge. On click it finds
+similar previously-solved problems, tells you whether the answer's fix has community evidence
+(verified, conflicting, outdated, mixed, mostly failing or unverified), warns when reports suggest it
+won't fit your setup, and lets you report whether it worked.
+
+## Quickstart
+
+Requires Docker, JDK 25, Node 22.18+ and pnpm.
+
+```sh
+docker compose up -d db && docker compose run --rm flyway   # Postgres + schema
+cd db && pnpm install && pnpm seed && cd ..                   # curated problems + synthetic evidence
+cd api && ./mvnw spring-boot:run                              # API on :8080 (separate terminal)
+cd extension && pnpm install && pnpm build                    # then load extension/.output/chrome-mv3
+cd demo && pnpm install && pnpm demo                          # scripted end-to-end demo
+```
+
+On Windows use `.\mvnw.cmd`. Load the extension at `chrome://extensions` → Developer mode →
+**Load unpacked**.
+
+## Demo (build step 6)
+
+`pnpm demo` (in `demo/`) runs the built extension in your Chrome against the running API through four
+scenarios, prints PASS/FAIL per scenario and saves a screenshot of each panel to `demo/out/`:
+
+| Scenario | ChatGPT answer | Expected badge |
+|---|---|---|
+| pip `externally-managed-environment` | create a venv | `Verified fix · N of M worked` |
+| Galaxy A14 won't super fast charge | enable Super fast charging | `Conflicting results · … · may not fit your setup` |
+| NumPy 2 breaks pandas | pin `numpy<2` | `Outdated fix · …` |
+| MX Master scroll wheel only in Chrome | (no stored fix) | `New fix · no community evidence yet`; after reporting "Worked" it is shared and re-checks as `Unverified · 1 of 1 worked` |
+
+ChatGPT needs a login, so the pages are stand-ins in ChatGPT's current DOM layout, served at
+`https://chatgpt.com/c/demo-…` by request interception; the extension runs on them unchanged. The demo
+uses its own anonymous token and deletes that user and everything it wrote at the end, so your own
+reports are untouched. `pnpm demo:show` shows the browser and slows it down for presenting.
+
+**Live on chatgpt.com**: ask the same questions and click the badge. Good prompts:
+
+```
+pip install fails on Ubuntu 24.04 with error: externally-managed-environment. How do I fix it?
+My Samsung Galaxy A14 won't super fast charge even though I bought a 25W Samsung charger. How do I enable it?
+import pandas crashes: A module that was compiled using NumPy 1.x cannot be run in NumPy 2.0.0. What should I do?
+```
+
 ## Database (build step 1)
 
 Requires Docker, Node 22.18+ and pnpm. Postgres listens on host port **5433**.

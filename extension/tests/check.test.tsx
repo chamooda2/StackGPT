@@ -1,7 +1,8 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
 import type { Actions, SolutionSummary, VerifyRequest, VerifyResponse } from '../src/lib/api';
-import { Check, headline, patch, SAME_PROBLEM, shareRequest } from '../src/ui/Check';
+import { Check } from '../src/ui/Check';
+import { headline, shareRequest } from '../src/ui/logic';
 import recorded from './fixtures/verify-response.json';
 
 // Recorded from the API: Galaxy A14 question whose answer matches a fix that works on the S24 but not the A14.
@@ -32,52 +33,18 @@ function fakeActions(data: VerifyResponse = resp): FakeActions {
   };
 }
 
-const open = async (a: Actions) => {
+const open = async (a: Actions, data: VerifyResponse = resp) => {
   render(<Check actions={a} />);
-  fireEvent.click(screen.getByRole('button', { name: 'Check with StackGPT' }));
-  await screen.findByText(top.title);
+  fireEvent.click(screen.getByRole('button', { name: /Check this answer/ }));
+  await screen.findByText(headline(data));
 };
 
-const solutionEl = () => screen.getByText(sol.body.slice(0, 40), { exact: false }).closest('.sg-sol') as HTMLElement;
+const panel = () => document.querySelector('.sg-panel') as HTMLElement;
+const report = () => within(document.querySelector('.sg-report') as HTMLElement);
+const expandTop = () => fireEvent.click(screen.getByRole('button', { name: new RegExp(top.title.slice(0, 30)) }));
+const card = () => within(document.querySelector('.sg-sol') as HTMLElement);
 
 afterEach(cleanup);
-
-describe('headline', () => {
-  it('names the trust status of the matching fix, its outcomes and a fit warning', () => {
-    const o = sol.outcomes;
-    expect(headline(resp)).toBe(
-      `StackGPT: matches a fix with conflicting results (${o.worked} worked · ${o.partial} partial · ${o.failed} failed) · may not fit your setup`,
-    );
-  });
-
-  it('covers partial, novel, no answer and no matches', () => {
-    expect(headline({ ...resp, alignment: { ...resp.alignment!, verdict: 'partial' } })).toMatch(/^StackGPT: partly overlaps a fix with conflicting results \(/);
-    expect(headline({ ...resp, alignment: { verdict: 'novel', problemId: null, solutionId: null, similarity: null } })).toBe(
-      'StackGPT: 1 similar problem, but this fix has no evidence yet',
-    );
-    expect(headline({ ...resp, alignment: null })).toBe(`StackGPT: 1 similar problem · best match ${Math.round(top.similarity! * 100)}%`);
-    expect(headline({ ...resp, matches: [] })).toBe('StackGPT: no similar problems found');
-  });
-});
-
-describe('patch', () => {
-  it("replaces one solution's evidence and the top-level trust status", () => {
-    const p = patch(resp, summary({ trust: { ...sol.trust, status: 'verified' } }));
-    expect(p.matches[0]!.solutions[0]!.outcomes.worked).toBe(sol.outcomes.worked + 1);
-    expect(p.matches[0]!.solutions[0]!.mine.outcome).toBe('worked');
-    expect(p.trustStatus).toBe('verified');
-    expect(p.matches[0]!.solutions[0]!.yourEnv).toEqual(sol.yourEnv);
-  });
-});
-
-describe('shareRequest', () => {
-  it('files the answer under the top match only when it is clearly the same problem', () => {
-    const same = { ...resp, matches: [{ ...top, similarity: SAME_PROBLEM, fit: { score: 0.8, conflicts: [] } }] };
-    expect(shareRequest(same, req)).toEqual({ problemId: top.problemId, body: 'Enable Super fast charging.', steps: ['Open Settings', 'Enable it'] });
-    const other = { ...resp, matches: [{ ...top, similarity: SAME_PROBLEM - 0.01 }] };
-    expect(shareRequest(other, req).problem).toEqual({ title: "My Samsung Galaxy A14 won't super fast charge", body: req.question });
-  });
-});
 
 describe('Check panel', () => {
   it('sends nothing until the user clicks Check', () => {
@@ -86,78 +53,94 @@ describe('Check panel', () => {
     expect(a.verify).not.toHaveBeenCalled();
   });
 
-  it('shows trust with reasons and demo-data labelling, setup outcomes and conflicts', async () => {
+  it('leads with a verdict: trust, reasons, evidence, demo labelling and setup warnings', async () => {
     await open(fakeActions());
-    const el = within(solutionEl());
-    expect(el.getByText('Conflicting')).toBeTruthy();
-    expect(el.getByText(sol.trust.reasons[0]!, { exact: false })).toBeTruthy();
-    expect(el.getByText('demo data', { exact: false })).toBeTruthy();
-    expect(el.getByText(/^In setups like yours:/)).toBeTruthy();
-    expect(el.getByText(sol.conflicts[0]!)).toBeTruthy();
-    expect(el.getByText(`Same fix as this answer (${Math.round(resp.alignment!.similarity! * 100)}%)`)).toBeTruthy();
+    const v = within(document.querySelector('.sg-verdict') as HTMLElement);
+    expect(v.getByText('Conflicting results')).toBeTruthy();
+    expect(v.getByText("ChatGPT's answer matches a fix the community has tested.")).toBeTruthy();
+    expect(v.getByText(sol.trust.reasons[0]!, { exact: false })).toBeTruthy();
+    expect(v.getByText(`${sol.outcomes.worked} worked`)).toBeTruthy();
+    expect(v.getByText(/all demo data/)).toBeTruthy();
+    expect(v.getByText(sol.conflicts[0]!)).toBeTruthy();
+    const y = sol.yourEnv!;
+    expect(v.getByText(`In setups like yours: ${y.worked} worked · ${y.partial} partly · ${y.failed} failed`)).toBeTruthy();
   });
 
-  it('reports an outcome with an optional note and shows the updated evidence', async () => {
-    const a = fakeActions();
-    await open(a);
-    const el = within(solutionEl());
-    fireEvent.click(el.getByRole('button', { name: 'Add context' }));
-    fireEvent.input(el.getByRole('textbox'), { target: { value: '  only after a reboot ' } });
-    fireEvent.click(el.getByRole('button', { name: "Didn't work" }));
-    await vi.waitFor(() => expect(a.attempt).toHaveBeenCalledWith({ solutionId: sol.id, outcome: 'failed', env: resp.query.env, note: 'only after a reboot' }));
-    expect(await el.findByText(`worked ${sol.outcomes.worked + 1}`)).toBeTruthy();
-    expect(el.getByRole('button', { name: 'Worked' }).getAttribute('aria-pressed')).toBe('true');
-  });
-
-  it('votes and flags separately from outcomes', async () => {
-    const a = fakeActions();
-    await open(a);
-    const el = within(solutionEl());
-    fireEvent.click(el.getByRole('button', { name: 'Yes 0' }));
-    expect(await el.findByRole('button', { name: 'Yes 1' })).toBeTruthy();
-    expect(a.vote).toHaveBeenCalledWith({ solutionId: sol.id, helpful: true });
-    fireEvent.click(el.getByRole('button', { name: 'Outdated' }));
-    const flagged = await el.findByRole('button', { name: 'Outdated 1' });
-    expect(flagged.hasAttribute('disabled')).toBe(true);
-    expect(a.attempt).not.toHaveBeenCalled();
+  it('keeps similar problems collapsed when there is a verdict, and expands on click', async () => {
+    await open(fakeActions());
+    expect(document.querySelector('.sg-sol')).toBeNull();
+    expandTop();
+    expect(card().getByText('Same as this answer')).toBeTruthy();
   });
 
   it("reports ChatGPT's answer on the fix it matches", async () => {
     const a = fakeActions();
     await open(a);
-    const report = screen.getByText("Did ChatGPT's answer work for you?").closest('.sg-report') as HTMLElement;
-    fireEvent.click(within(report).getByRole('button', { name: 'Worked' }));
+    fireEvent.click(report().getByRole('button', { name: 'Worked' }));
     await vi.waitFor(() => expect(a.attempt).toHaveBeenCalledWith({ solutionId: sol.id, outcome: 'worked', env: resp.query.env }));
+    expect(await report().findByText(/your report is counted/)).toBeTruthy();
     expect(a.submit).not.toHaveBeenCalled();
+  });
+
+  it('reports on a listed fix with an optional note and shows updated evidence', async () => {
+    const a = fakeActions();
+    await open(a);
+    expandTop();
+    fireEvent.click(card().getByRole('button', { name: 'Add context' }));
+    fireEvent.input(card().getByRole('textbox'), { target: { value: '  only after a reboot ' } });
+    fireEvent.click(card().getByRole('button', { name: "Didn't work" }));
+    await vi.waitFor(() => expect(a.attempt).toHaveBeenCalledWith({ solutionId: sol.id, outcome: 'failed', env: resp.query.env, note: 'only after a reboot' }));
+    expect(await card().findByText(`${sol.outcomes.worked + 1} worked`)).toBeTruthy();
+    expect(card().getByRole('button', { name: 'Worked' }).getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('votes and flags separately from outcomes', async () => {
+    const a = fakeActions();
+    await open(a);
+    expandTop();
+    fireEvent.click(card().getByRole('button', { name: 'Yes 0' }));
+    expect(await card().findByRole('button', { name: 'Yes 1' })).toBeTruthy();
+    expect(a.vote).toHaveBeenCalledWith({ solutionId: sol.id, helpful: true });
+    fireEvent.click(card().getByRole('button', { name: 'Outdated' }));
+    expect((await card().findByRole('button', { name: 'Outdated 1' })).hasAttribute('disabled')).toBe(true);
+    expect(a.attempt).not.toHaveBeenCalled();
   });
 
   it('shares a novel answer as a new fix before reporting on it', async () => {
     const novel = { ...resp, alignment: { verdict: 'novel' as const, problemId: null, solutionId: null, similarity: null } };
     const a = fakeActions(novel);
-    await open(a);
-    expect(screen.getByText(/Reporting shares this question and answer/)).toBeTruthy();
-    const report = screen.getByText("Did ChatGPT's answer work for you?").closest('.sg-report') as HTMLElement;
-    fireEvent.click(within(report).getByRole('button', { name: 'Partly' }));
+    await open(a, novel);
+    expect(within(panel()).getByText('No community evidence yet')).toBeTruthy();
+    expect(report().getByText(/shares this question and answer/)).toBeTruthy();
+    fireEvent.click(report().getByRole('button', { name: 'Partly' }));
     await vi.waitFor(() => expect(a.attempt).toHaveBeenCalledWith({ solutionId: 999, outcome: 'partial', env: resp.query.env }));
     expect(a.submit).toHaveBeenCalledWith(shareRequest(novel, req));
-    expect(await screen.findByText(/^Shared as a new fix/)).toBeTruthy();
+    expect(await report().findByText(/^Shared as a new fix/)).toBeTruthy();
   });
 
-  it('shows write errors next to the solution', async () => {
+  it('shows write errors where the action happened', async () => {
     const a = fakeActions();
     a.attempt.mockRejectedValueOnce(new Error('that fix no longer exists'));
     await open(a);
-    fireEvent.click(within(solutionEl()).getByRole('button', { name: 'Worked' }));
-    expect(await within(solutionEl()).findByRole('alert')).toBeTruthy();
+    fireEvent.click(report().getByRole('button', { name: 'Worked' }));
+    expect((await report().findByRole('alert')).textContent).toBe('that fix no longer exists');
+  });
+
+  it('collapses and expands the panel from the badge', async () => {
+    await open(fakeActions());
+    const badge = screen.getByRole('button', { expanded: true });
+    fireEvent.click(badge);
+    expect(panel()).toBeNull();
+    expect(badge.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('shows a verify error with retry', async () => {
     const a = fakeActions();
     a.verify.mockRejectedValueOnce(new Error('API not reachable at http://localhost:8080'));
     render(<Check actions={a} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Check with StackGPT' }));
-    expect(await screen.findByText('StackGPT: API not reachable at http://localhost:8080')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Check this answer/ }));
+    expect(await screen.findByText('API not reachable at http://localhost:8080')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(await screen.findByText(top.title)).toBeTruthy();
+    expect(await screen.findByText(headline(resp))).toBeTruthy();
   });
 });

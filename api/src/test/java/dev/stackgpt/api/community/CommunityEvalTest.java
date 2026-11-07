@@ -73,25 +73,29 @@ class CommunityEvalTest {
 			assertThat(users.find(TOKEN)).isEqualTo(user);
 			long sol = jdbc.queryForObject("select id from solutions where source_id = 'py-002-s1'", Long.class);
 
+			// Relative to the current counts: the dev DB may already hold real reports.
+			var base = svc.summary(sol, null).outcomes();
 			var s = svc.attempt(user, new AttemptRequest(sol, "worked", Map.of("os", "linux"), null));
-			assertThat(s.outcomes().worked()).isEqualTo(20);
-			assertThat(s.outcomes().synthetic()).isEqualTo(20); // the new real report is not synthetic
+			assertThat(s.outcomes().worked()).isEqualTo(base.worked() + 1);
+			assertThat(s.outcomes().synthetic()).isEqualTo(base.synthetic()); // the new real report is not synthetic
 			assertThat(s.mine().outcome()).isEqualTo("worked");
 			assertThat(s.trust().status()).isEqualTo("verified");
 
 			s = svc.attempt(user, new AttemptRequest(sol, "failed", Map.of("os", "linux"), "still errors in a venv"));
-			assertThat(List.of(s.outcomes().worked(), s.outcomes().failed())).containsExactly(19, 1); // replaced, not added
+			assertThat(List.of(s.outcomes().worked(), s.outcomes().failed())).containsExactly(base.worked(), base.failed() + 1); // replaced, not added
 			assertThat(s.mine().outcome()).isEqualTo("failed");
 
+			var votes = s.votes();
 			s = svc.vote(user, new VoteRequest(sol, true));
-			assertThat(s.votes().helpful()).isEqualTo(1);
+			assertThat(s.votes().helpful()).isEqualTo(votes.helpful() + 1);
 			assertThat(s.mine().helpful()).isTrue();
 			s = svc.vote(user, new VoteRequest(sol, false));
-			assertThat(List.of(s.votes().helpful(), s.votes().notHelpful())).containsExactly(0, 1);
+			assertThat(List.of(s.votes().helpful(), s.votes().notHelpful())).containsExactly(votes.helpful(), votes.notHelpful() + 1);
 
+			int outdated = s.flags().outdated();
 			svc.flag(user, new FlagRequest(sol, "outdated"));
 			s = svc.flag(user, new FlagRequest(sol, "outdated"));
-			assertThat(s.flags().outdated()).isEqualTo(1);
+			assertThat(s.flags().outdated()).isEqualTo(outdated + 1);
 			assertThat(s.mine().flags()).containsExactly("outdated");
 
 			assertThat(svc.summary(sol, null).mine().outcome()).isNull(); // anonymous read
@@ -103,6 +107,10 @@ class CommunityEvalTest {
 					List.of("Open chrome://flags", "Disable Smooth Scrolling", "Restart Chrome"), null));
 			assertThat(created.problemTitle()).isEqualTo(q);
 			assertThat(created.trust().status()).isEqualTo("unverified");
+			assertThat(jdbc.queryForList("""
+					select p.user_id from problems p join solutions s on s.problem_id = p.id where s.id = ?
+					union all select user_id from solutions where id = ?""", Long.class, created.id(), created.id()))
+					.containsExactly(user, user);
 			assertThat(jdbc.queryForObject("select embedding is not null from solutions where id = ?", Boolean.class, created.id())).isTrue();
 			svc.attempt(user, new AttemptRequest(created.id(), "worked", Map.of(), null));
 

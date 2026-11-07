@@ -82,25 +82,25 @@ public class CommunityService {
 		if ((r.problemId() == null) == (r.problem() == null))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "give exactly one of problemId or problem");
 		long sid = tx.execute(s -> {
-			long pid = r.problemId() != null ? requireProblem(r.problemId()) : newProblem(r.problem().title(), r.problem().body());
+			long pid = r.problemId() != null ? requireProblem(r.problemId()) : newProblem(user, r.problem().title(), r.problem().body());
 			return jdbc.queryForObject("""
-					insert into solutions (problem_id, body, steps, code, source, source_id, license)
-					values (?, ?, ?::jsonb, ?, ?, ?, ?) returning id""", Long.class,
+					insert into solutions (problem_id, body, steps, code, source, source_id, license, user_id)
+					values (?, ?, ?::jsonb, ?, ?, ?, ?, ?) returning id""", Long.class,
 					pid, r.body(), json.writeValueAsString(r.steps() == null ? List.of() : r.steps()), r.code(),
-					USER_SOURCE, UUID.randomUUID().toString(), USER_LICENSE);
+					USER_SOURCE, UUID.randomUUID().toString(), USER_LICENSE, user);
 		});
 		backfill.ifAvailable(Backfill::run);
 		return summary(sid, user);
 	}
 
 	/** Domain is guessed: a detected device means consumer electronics, anything else programming. */
-	long newProblem(String title, String body) {
+	long newProblem(long user, String title, String body) {
 		var x = ex.extract(title + "\n" + body);
 		String domain = x.env().containsKey("device") ? "electronics" : "programming";
 		return jdbc.queryForObject("""
-				insert into problems (domain, title, body, source, source_id, license)
-				values (?, ?, ?, ?, ?, ?) returning id""", Long.class,
-				domain, title, body, USER_SOURCE, UUID.randomUUID().toString(), USER_LICENSE);
+				insert into problems (domain, title, body, source, source_id, license, user_id)
+				values (?, ?, ?, ?, ?, ?, ?) returning id""", Long.class,
+				domain, title, body, USER_SOURCE, UUID.randomUUID().toString(), USER_LICENSE, user);
 	}
 
 	public SolutionSummary summary(long id, Long user) {
