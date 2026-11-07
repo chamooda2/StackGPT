@@ -1,0 +1,36 @@
+name: stackgpt
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-stackgpt}
+      POSTGRES_USER: ${POSTGRES_USER:-stackgpt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stackgpt}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # One-shot migrator. From step 2 the API runs the same migrations via Spring Boot's Flyway.
+  flyway:
+    image: flyway/flyway:11
+    command: -connectRetries=10 migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-stackgpt}
+      FLYWAY_USER: ${POSTGRES_USER:-stackgpt}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-stackgpt}
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    volumes:
+      - ./api/src/main/resources/db/migration:/flyway/sql:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

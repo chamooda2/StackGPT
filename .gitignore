@@ -1,0 +1,10 @@
+node_modules/
+.env
+target/
+dist/
+.output/
+.wxt/
+*.log
+db/seed/raw/
+.idea/
+.vscode/

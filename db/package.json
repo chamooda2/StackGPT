@@ -1,0 +1,19 @@
+{
+  "name": "stackgpt-db",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node --env-file-if-exists=../.env src/seed.ts",
+    "check": "node --env-file-if-exists=../.env src/check.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "typescript": "^7.0.2"
+  }
+}

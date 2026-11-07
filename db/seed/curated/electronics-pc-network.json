@@ -1,0 +1,397 @@
+{
+  "domain": "electronics",
+  "problems": [
+    {
+      "id": "pc-01",
+      "title": "Unknown USB Device (Device Descriptor Request Failed) Code 43",
+      "body": "My USB drive is not recognized. Device Manager shows 'Unknown USB Device (Device Descriptor Request Failed)' with 'Windows has stopped this device because it has reported problems. (Code 43)'.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["usb", "windows", "code-43", "device-manager"],
+      "created": "2023-08-14",
+      "solutions": [
+        {
+          "id": "pc-01-s1",
+          "body": "Fully power-drain the laptop: shut down, unplug the charger and all USB devices, hold the power button for 30 seconds, then boot and reconnect.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "pc-01-s2",
+          "body": "Disable USB selective suspend: Control Panel > Power Options > Change plan settings > Advanced > USB settings > USB selective suspend > Disabled.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pc-02",
+      "title": "External monitor not detected through laptop USB-C port",
+      "body": "I connected a USB-C to HDMI adapter to my laptop's USB-C port, but the monitor says 'No signal' and Windows doesn't detect it.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["usb-c", "displayport-alt-mode", "monitor"],
+      "created": "2024-01-31",
+      "solutions": [
+        {
+          "id": "pc-02-s1",
+          "body": "Use a USB-C port that supports DisplayPort Alt Mode or Thunderbolt (look for the DP or lightning-bolt icon next to the port), and update the graphics driver.",
+          "evidence": { "profile": "conflicting", "works": { "device": "Dell XPS 13 9310" }, "fails": { "device": "Lenovo IdeaPad 3 15ADA05" } }
+        }
+      ]
+    },
+    {
+      "id": "pc-03",
+      "title": "MacBook Air only drives one external monitor",
+      "body": "I connected two monitors to my MacBook Air through a dock but only one ever lights up.",
+      "env": { "os": "macos", "osVer": "14" },
+      "tags": ["macbook", "external-display", "apple-silicon", "displaylink"],
+      "created": "2024-03-19",
+      "solutions": [
+        {
+          "id": "pc-03-s1",
+          "body": "Base M1/M2 chips support only one external display natively. Use a DisplayLink dock or adapter and install the DisplayLink Manager app for the second monitor.",
+          "evidence": { "profile": "verified", "env": { "device": "MacBook Air M2" } }
+        },
+        {
+          "id": "pc-03-s2",
+          "body": "Close the lid (clamshell mode) with power connected; the MacBook then drives two external displays.",
+          "evidence": { "profile": "conflicting", "works": { "device": "MacBook Air M3" }, "fails": { "device": "MacBook Air M2" } }
+        }
+      ]
+    },
+    {
+      "id": "pc-04",
+      "title": "Windows 11: 'Your PIN is no longer available due to a change to the security settings on this device'",
+      "body": "After an update, the sign-in screen says 'Your PIN is no longer available due to a change to the security settings on this device' and offers to set up the PIN again, which fails.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["windows-hello", "pin", "sign-in"],
+      "created": "2023-07-24",
+      "solutions": [
+        {
+          "id": "pc-04-s1",
+          "body": "Sign in with your account password, then reset the Windows Hello container by deleting the Ngc folder and setting up a new PIN.",
+          "steps": ["Sign in with the account password (Sign-in options > key icon)", "As administrator, take ownership of and delete C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\Microsoft\\Ngc", "Settings > Accounts > Sign-in options > PIN > Set up"],
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pc-05",
+      "title": "Laptop battery says 'Plugged in, not charging' at 60-80%",
+      "body": "My laptop stops charging at around 60% and shows 'Plugged in, not charging'. The battery is less than a year old.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["laptop", "battery", "charge-threshold"],
+      "created": "2024-04-29",
+      "solutions": [
+        {
+          "id": "pc-05-s1",
+          "body": "A battery conservation threshold is enabled. In Lenovo Vantage > Power > Battery settings, turn off Conservation Mode (or change the custom charge threshold).",
+          "evidence": { "profile": "conflicting", "works": { "device": "Lenovo ThinkPad T14 Gen 3" }, "fails": { "device": "HP EliteBook 840 G8" } }
+        }
+      ]
+    },
+    {
+      "id": "pc-06",
+      "title": "Windows Update KB5034441 fails with error 0x80070643",
+      "body": "The security update KB5034441 keeps failing with 0x80070643 in Windows Update on Windows 10 22H2.",
+      "env": { "os": "windows", "osVer": "10 22H2" },
+      "tags": ["windows-update", "winre", "0x80070643"],
+      "created": "2024-01-12",
+      "solutions": [
+        {
+          "id": "pc-06-s1",
+          "body": "The WinRE recovery partition is too small. Shrink the OS partition and enlarge the recovery partition by 250 MB following Microsoft's manual steps for KB5034441, then retry the update.",
+          "evidence": { "profile": "outdated" }
+        }
+      ]
+    },
+    {
+      "id": "pc-07",
+      "title": "Wi-Fi option disappeared from Windows 11 settings",
+      "body": "After a Windows update, the Wi-Fi tile and Wi-Fi section in Settings are gone; only Ethernet appears.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["wifi", "windows", "network-adapter"],
+      "created": "2024-05-22",
+      "solutions": [
+        {
+          "id": "pc-07-s1",
+          "body": "Run Network reset: Settings > Network & internet > Advanced network settings > Network reset > Reset now, then restart.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "pc-07-s2",
+          "body": "Uninstall the Wi-Fi adapter in Device Manager (tick 'delete driver' if offered), restart, and install the vendor's driver.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pc-08",
+      "title": "Keyboard types the wrong symbols (@ and \" swapped)",
+      "body": "When I press Shift+2 I get \" instead of @, and some other symbols are in the wrong place.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["keyboard", "layout", "windows"],
+      "created": "2023-06-05",
+      "solutions": [
+        {
+          "id": "pc-08-s1",
+          "body": "Windows switched to a different keyboard layout (e.g. UK instead of US). Remove the extra layout in Settings > Time & language > Language & region > language options > Keyboards, or switch with Win+Space.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pc-09",
+      "title": "MacBook shows 'Battery is not charging' while plugged in",
+      "body": "My MacBook's battery menu says 'Battery Is Not Charging' even though the charger is connected and the battery is at 50%.",
+      "env": { "os": "macos", "osVer": "14" },
+      "tags": ["macbook", "battery", "smc"],
+      "created": "2023-11-29",
+      "solutions": [
+        {
+          "id": "pc-09-s1",
+          "body": "Reset the SMC: shut down, hold left Shift + left Control + left Option + power for 10 seconds, release, and start up.",
+          "evidence": { "profile": "conflicting", "works": { "device": "MacBook Pro 2019 (Intel)" }, "fails": { "device": "MacBook Air M1" } }
+        },
+        {
+          "id": "pc-09-s2",
+          "body": "If Optimized Battery Charging is on, macOS deliberately pauses at 80%. Choose 'Charge to Full Now' from the battery menu.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pc-10",
+      "title": "BitLocker recovery screen after BIOS update",
+      "body": "After a BIOS update my laptop boots into a blue 'BitLocker recovery' screen asking for a 48-digit recovery key.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["bitlocker", "bios", "recovery-key"],
+      "created": "2024-07-19",
+      "solutions": [
+        {
+          "id": "pc-10-s1",
+          "body": "Find the key in your Microsoft account (account.microsoft.com > Devices > Manage recovery keys) from another device, match the Key ID shown on screen, and enter it.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pc-11",
+      "title": "Bluetooth missing from Windows 11 Settings and Device Manager",
+      "body": "The Bluetooth toggle vanished from Quick Settings and the Bluetooth category is missing in Device Manager.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["bluetooth", "windows", "device-manager"],
+      "created": "2024-03-01",
+      "solutions": [
+        {
+          "id": "pc-11-s1",
+          "body": "Power-drain the laptop: shut down, unplug the charger, hold power for 30 seconds, then boot. The combo Wi-Fi/Bluetooth chip re-enumerates.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "pc-11-s2",
+          "body": "Install the Bluetooth driver from the laptop manufacturer's support page.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pc-12",
+      "title": "Xbox controller won't pair over Bluetooth with computer",
+      "body": "My Xbox Wireless Controller shows up in Bluetooth settings but fails to pair or disconnects immediately.",
+      "env": { "device": "Xbox Wireless Controller" },
+      "tags": ["xbox-controller", "bluetooth", "firmware"],
+      "created": "2024-02-24",
+      "solutions": [
+        {
+          "id": "pc-12-s1",
+          "body": "Update the controller firmware with the Xbox Accessories app (connect via USB cable, open the app, choose Update), then pair again.",
+          "evidence": { "profile": "conflicting", "works": { "os": "windows" }, "fails": { "os": "macos" } }
+        }
+      ]
+    },
+    {
+      "id": "nw-01",
+      "title": "Windows: Wi-Fi 'Connected, no internet'",
+      "body": "My Windows laptop shows 'No internet, secured' on Wi-Fi while other devices work fine on the same network.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["wifi", "windows", "dns", "tcpip"],
+      "created": "2023-05-16",
+      "solutions": [
+        {
+          "id": "nw-01-s1",
+          "body": "Reset the IP configuration, DNS cache, and Winsock catalog from an elevated Command Prompt, then restart.",
+          "code": "ipconfig /release\nipconfig /renew\nipconfig /flushdns\nnetsh winsock reset\nnetsh int ip reset",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "nw-02",
+      "title": "Smart plug can't connect to mesh Wi-Fi during setup",
+      "body": "My new smart plug fails at the 'connecting to Wi-Fi' step every time. My mesh network uses one name for 2.4 and 5 GHz.",
+      "env": { "device": "TP-Link Kasa KP115" },
+      "tags": ["smart-home", "wifi", "2.4ghz", "mesh"],
+      "created": "2024-06-07",
+      "solutions": [
+        {
+          "id": "nw-02-s1",
+          "body": "Most smart plugs only support 2.4 GHz. Temporarily disable 5 GHz (or create a separate 2.4 GHz SSID/IoT network) during setup, and keep the phone near the plug.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-03",
+      "title": "Nintendo Switch NAT type D / error 2618-0516 in online games",
+      "body": "Online matches fail with 'Error Code: 2618-0516' and the connection test shows NAT Type D.",
+      "env": { "device": "Nintendo Switch" },
+      "tags": ["nintendo-switch", "nat", "upnp", "router"],
+      "created": "2023-12-19",
+      "solutions": [
+        {
+          "id": "nw-03-s1",
+          "body": "Enable UPnP on the router, restart the Switch, and rerun the connection test.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "nw-03-s2",
+          "body": "Give the Switch a static IP and forward UDP ports 1-65535 to it (or put it in the router's DMZ).",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "nw-04",
+      "title": "PS5 downloads are very slow on Wi-Fi",
+      "body": "Game downloads on my PS5 crawl at a few MB/s even though my connection is 500 Mbps.",
+      "env": { "device": "PlayStation 5" },
+      "tags": ["ps5", "download", "wifi", "dns"],
+      "created": "2024-01-24",
+      "solutions": [
+        {
+          "id": "nw-04-s1",
+          "body": "Connect the PS5 with an Ethernet cable.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "nw-04-s2",
+          "body": "Set DNS manually to 1.1.1.1 and 8.8.8.8 in Settings > Network > Set Up Internet Connection > Advanced Settings.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "nw-05",
+      "title": "Double NAT with ISP modem-router and my own router",
+      "body": "My own Wi-Fi router is connected to the ISP's modem-router. Port forwarding doesn't work and consoles report strict NAT.",
+      "env": {},
+      "tags": ["router", "double-nat", "bridge-mode"],
+      "created": "2023-10-30",
+      "solutions": [
+        {
+          "id": "nw-05-s1",
+          "body": "Put the ISP modem-router into bridge (modem-only) mode so only your router does NAT, then restart both.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-06",
+      "title": "Android: Wi-Fi says 'Connected without internet'",
+      "body": "My Android phone shows 'Connected without internet' on my home Wi-Fi; laptops work fine.",
+      "env": { "os": "android", "osVer": "14" },
+      "tags": ["android", "wifi", "private-dns"],
+      "created": "2024-02-05",
+      "solutions": [
+        {
+          "id": "nw-06-s1",
+          "body": "A custom Private DNS host is unreachable. Set Settings > Network & internet > Private DNS to Automatic or Off.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-07",
+      "title": "iPhone shows 'Weak Security' warning for home Wi-Fi",
+      "body": "Under my Wi-Fi network name the iPhone says 'Weak Security: WPA/WPA2 (TKIP) is not considered secure'.",
+      "env": { "os": "ios", "osVer": "17" },
+      "tags": ["iphone", "wifi", "wpa2", "router"],
+      "created": "2023-09-07",
+      "solutions": [
+        {
+          "id": "nw-07-s1",
+          "body": "In the router's wireless security settings choose WPA2-Personal (AES) or WPA2/WPA3 mixed mode instead of WPA/WPA2 TKIP.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-08",
+      "title": "Chromecast (2nd gen) shows 'Untrusted device' and can't cast",
+      "body": "Since early March 2025 my Chromecast 2nd gen can't be cast to; the Google Home app says it's an untrusted device or can't be verified.",
+      "env": { "device": "Chromecast (2nd gen)" },
+      "tags": ["chromecast", "google-home", "certificate"],
+      "created": "2025-03-10",
+      "solutions": [
+        {
+          "id": "nw-08-s1",
+          "body": "Factory reset the Chromecast by holding its button for 25 seconds.",
+          "evidence": { "profile": "failing" }
+        },
+        {
+          "id": "nw-08-s2",
+          "body": "Don't factory reset. Keep the device powered on and connected; Google pushed a firmware update that restores casting. If you already reset it, update the Google Home app and set it up again.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-09",
+      "title": "Windows 11 can't access NAS share: organization's security policies block unauthenticated guest access",
+      "body": "Opening \\\\nas\\share fails: 'You can't access this shared folder because your organization's security policies block unauthenticated guest access.'",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["smb", "nas", "windows", "guest-access"],
+      "created": "2024-03-26",
+      "solutions": [
+        {
+          "id": "nw-09-s1",
+          "body": "Enable insecure guest logons: gpedit.msc > Computer Configuration > Administrative Templates > Network > Lanman Workstation > 'Enable insecure guest logons' > Enabled.",
+          "evidence": { "profile": "conflicting", "works": { "osVer": "11 23H2" }, "fails": { "osVer": "11 24H2" } }
+        },
+        {
+          "id": "nw-09-s2",
+          "body": "Create a user account with a password on the NAS and connect with those credentials instead of guest access.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-10",
+      "title": "Ethernet link stuck at 100 Mbps instead of 1 Gbps",
+      "body": "My PC's network adapter shows a link speed of 100 Mbps although the router and the PC are gigabit.",
+      "env": {},
+      "tags": ["ethernet", "cable", "link-speed"],
+      "created": "2023-08-22",
+      "solutions": [
+        {
+          "id": "nw-10-s1",
+          "body": "Gigabit needs all four wire pairs. Replace the cable with a known-good Cat5e/Cat6 cable; check for bent pins on the plugs.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "nw-11",
+      "title": "Netflix error NW-2-5 on smart TV",
+      "body": "Netflix on my smart TV shows 'Netflix has encountered an error. Code: NW-2-5'. Other apps work intermittently.",
+      "env": { "device": "LG OLED C2" },
+      "tags": ["netflix", "smart-tv", "network"],
+      "created": "2024-04-07",
+      "solutions": [
+        {
+          "id": "nw-11-s1",
+          "body": "Restart the TV and router, and set the TV's DNS to automatic. If on Wi-Fi, try Ethernet.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    }
+  ]
+}

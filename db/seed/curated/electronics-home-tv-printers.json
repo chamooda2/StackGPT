@@ -1,0 +1,258 @@
+{
+  "domain": "electronics",
+  "problems": [
+    {
+      "id": "pr-01",
+      "title": "HP printer keeps showing 'Offline' on Windows 11",
+      "body": "My HP network printer works for a while, then Windows shows it as 'Offline' and print jobs sit in the queue.",
+      "env": { "os": "windows", "osVer": "11", "device": "HP OfficeJet Pro 9015e" },
+      "tags": ["printer", "hp", "offline", "windows"],
+      "created": "2023-10-04",
+      "solutions": [
+        {
+          "id": "pr-01-s1",
+          "body": "The printer's IP address changes. Create a DHCP reservation for the printer on the router, then remove and re-add the printer in Windows.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "pr-01-s2",
+          "body": "Run HP Smart's 'Diagnose & Fix' or HP Print and Scan Doctor.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pr-02",
+      "title": "Operation failed with error 0x0000011b when connecting to shared printer",
+      "body": "Connecting to a printer shared from another Windows PC fails: 'Windows cannot connect to the printer. Operation failed with error 0x0000011b'.",
+      "env": { "os": "windows", "osVer": "10" },
+      "tags": ["printer", "windows", "0x0000011b", "printnightmare"],
+      "created": "2021-09-20",
+      "solutions": [
+        {
+          "id": "pr-02-s1",
+          "body": "On the PC sharing the printer, add the registry value HKLM\\System\\CurrentControlSet\\Control\\Print RpcAuthnLevelPrivacyEnabled (DWORD) = 0 and restart the spooler.",
+          "code": "reg add \"HKLM\\System\\CurrentControlSet\\Control\\Print\" /v RpcAuthnLevelPrivacyEnabled /t REG_DWORD /d 0 /f\nnet stop spooler && net start spooler",
+          "evidence": { "profile": "outdated", "env": { "os": "windows" } }
+        },
+        {
+          "id": "pr-02-s2",
+          "body": "Add the printer directly by IP (Add printer > 'Add a printer using an IP address or hostname') instead of through the shared connection.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-03",
+      "title": "Canon PIXMA support code 1688 (ink has run out)",
+      "body": "My Canon PIXMA shows 'Support Code 1688 – The ink has run out' right after I refilled the cartridge.",
+      "env": { "device": "Canon PIXMA MG3650" },
+      "tags": ["canon", "printer", "ink", "1688"],
+      "created": "2023-07-03",
+      "solutions": [
+        {
+          "id": "pr-03-s1",
+          "body": "Press and hold the Stop button for 5-10 seconds to continue printing with ink level detection disabled for that cartridge.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pr-04",
+      "title": "Print Spooler keeps stopping, print jobs stuck in queue",
+      "body": "Print jobs stay stuck in the queue and can't be deleted; the Print Spooler service stops on its own.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["printer", "spooler", "windows"],
+      "created": "2023-06-27",
+      "solutions": [
+        {
+          "id": "pr-04-s1",
+          "body": "Stop the spooler, delete the stuck spool files, and start it again (elevated Command Prompt).",
+          "code": "net stop spooler\ndel /Q /F %systemroot%\\System32\\spool\\PRINTERS\\*\nnet start spooler",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "pr-05",
+      "title": "Samsung TV shows no signal / no 4K120 from PS5 over HDMI",
+      "body": "My PS5 shows a black screen or can't select 4K 120Hz on my Samsung TV.",
+      "env": { "device": "Samsung QN90B" },
+      "tags": ["samsung-tv", "hdmi", "ps5", "4k120"],
+      "created": "2023-11-14",
+      "solutions": [
+        {
+          "id": "pr-05-s1",
+          "body": "Enable Input Signal Plus for the HDMI port: Settings > General > External Device Manager > Input Signal Plus > turn on for the PS5's HDMI input, and use the TV's HDMI 2.1 port with the PS5's included cable.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-06",
+      "title": "Fire TV Stick remote not responding",
+      "body": "My Fire TV Stick remote stopped working even with new batteries.",
+      "env": { "device": "Fire TV Stick 4K" },
+      "tags": ["fire-tv", "remote", "pairing"],
+      "created": "2024-01-17",
+      "solutions": [
+        {
+          "id": "pr-06-s1",
+          "body": "Reset and re-pair the remote.",
+          "steps": ["Hold Left, Menu, and Back together for 12 seconds, release, and wait 5 seconds", "Remove the batteries and unplug the Fire TV for 60 seconds", "Reinsert batteries, plug the Fire TV back in, and press Home on the remote once the home screen loads"],
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-07",
+      "title": "Roku shows 'HDCP error detected'",
+      "body": "My Roku shows a purple screen with 'HDCP error detected' on my TV.",
+      "env": { "device": "Roku Streaming Stick 4K" },
+      "tags": ["roku", "hdcp", "hdmi"],
+      "created": "2023-08-08",
+      "solutions": [
+        {
+          "id": "pr-07-s1",
+          "body": "Connect the Roku directly to the TV (no HDMI switch or receiver), try a different HDMI port and cable, and power-cycle the TV and Roku.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-08",
+      "title": "Soundbar audio out of sync with TV picture over HDMI ARC",
+      "body": "Speech from my soundbar lags behind lip movement when connected via HDMI ARC.",
+      "env": { "device": "Sonos Beam (Gen 2)" },
+      "tags": ["soundbar", "hdmi-arc", "lip-sync"],
+      "created": "2024-02-19",
+      "solutions": [
+        {
+          "id": "pr-08-s1",
+          "body": "Set the TV's digital audio output to Passthrough/Auto, enable eARC if available, and adjust the TV's AV sync / audio delay setting.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pr-09",
+      "title": "Nintendo Switch Joy-Con drift",
+      "body": "My left Joy-Con's character keeps moving even when I'm not touching the stick.",
+      "env": { "device": "Nintendo Switch Joy-Con" },
+      "tags": ["nintendo-switch", "joy-con", "stick-drift"],
+      "created": "2023-05-30",
+      "solutions": [
+        {
+          "id": "pr-09-s1",
+          "body": "Recalibrate the stick: System Settings > Controllers and Sensors > Calibrate Control Sticks.",
+          "evidence": { "profile": "partial" }
+        },
+        {
+          "id": "pr-09-s2",
+          "body": "Replace the analog stick module or send the Joy-Con to Nintendo for repair; drift is usually wear of the stick sensor.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-10",
+      "title": "PS5 DualSense controller won't connect",
+      "body": "My DualSense controller just blinks and won't connect to the PS5.",
+      "env": { "device": "PlayStation 5 DualSense" },
+      "tags": ["ps5", "dualsense", "controller"],
+      "created": "2023-12-28",
+      "solutions": [
+        {
+          "id": "pr-10-s1",
+          "body": "Reset the controller with a pin in the small hole on the back (hold 5 seconds), then connect it to the PS5 with a USB cable and press the PS button.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-11",
+      "title": "Ring Video Doorbell keeps going offline",
+      "body": "My Ring doorbell disconnects from Wi-Fi several times a day.",
+      "env": { "device": "Ring Video Doorbell (2nd gen)" },
+      "tags": ["ring", "doorbell", "wifi"],
+      "created": "2024-03-11",
+      "solutions": [
+        {
+          "id": "pr-11-s1",
+          "body": "Check signal strength in the Ring app (Device Health > Signal Strength / RSSI). If it's weak, add a Ring Chime Pro or mesh node closer to the door.",
+          "evidence": { "profile": "partial" }
+        },
+        {
+          "id": "pr-11-s2",
+          "body": "Reconnect it in the Ring app: Device Health > Change Wi-Fi Network, choosing a 2.4 GHz network.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-12",
+      "title": "Philips Hue lights show as 'Unreachable'",
+      "body": "Some of my Hue bulbs show 'Unreachable' in the Hue app.",
+      "env": { "device": "Philips Hue Bridge" },
+      "tags": ["philips-hue", "zigbee", "smart-home"],
+      "created": "2023-09-18",
+      "solutions": [
+        {
+          "id": "pr-12-s1",
+          "body": "Make sure the wall switch for those bulbs stays on; a switched-off fixture cuts power to the bulb. Use a smart switch or switch cover if needed.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "pr-12-s2",
+          "body": "Change the Hue Bridge's Zigbee channel (Settings > Bridge > Zigbee channel change) to avoid Wi-Fi interference.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "pr-13",
+      "title": "Kindle frozen on a page or stuck on boot screen",
+      "body": "My Kindle is frozen and won't respond to taps or the power button.",
+      "env": { "device": "Kindle Paperwhite (11th gen)" },
+      "tags": ["kindle", "frozen", "restart"],
+      "created": "2024-06-03",
+      "solutions": [
+        {
+          "id": "pr-13-s1",
+          "body": "Hold the power button for 40 seconds (or until the device restarts), then release.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-14",
+      "title": "Apple Watch won't pair with new iPhone",
+      "body": "Setting up my Apple Watch with a new iPhone gets stuck at 'Pairing' or fails with 'Unable to pair'.",
+      "env": { "os": "ios", "osVer": "18", "device": "Apple Watch Series 8" },
+      "tags": ["apple-watch", "pairing", "iphone"],
+      "created": "2024-10-14",
+      "solutions": [
+        {
+          "id": "pr-14-s1",
+          "body": "Update the iPhone to the latest iOS, then erase the watch (Settings > General > Reset > Erase All Content and Settings) and pair again.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "pr-15",
+      "title": "Smart TV apps keep crashing or say not enough memory",
+      "body": "Apps on my LG TV close on their own and show 'This app will now restart to free up more memory'.",
+      "env": { "device": "LG UQ7500" },
+      "tags": ["lg-tv", "webos", "memory"],
+      "created": "2024-05-09",
+      "solutions": [
+        {
+          "id": "pr-15-s1",
+          "body": "Turn off Quick Start+ (Settings > General > Devices > TV Management or Additional Settings) so the TV fully restarts when powered off, clearing memory.",
+          "evidence": { "profile": "unverified" }
+        }
+      ]
+    }
+  ]
+}

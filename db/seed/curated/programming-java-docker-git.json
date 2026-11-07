@@ -1,0 +1,263 @@
+{
+  "domain": "programming",
+  "problems": [
+    {
+      "id": "jv-001",
+      "title": "UnsupportedClassVersionError: class file version 65.0, runtime only recognizes up to 61.0",
+      "body": "Running the jar fails:\nException in thread \"main\" java.lang.UnsupportedClassVersionError: com/example/App has been compiled by a more recent version of the Java Runtime (class file version 65.0), this version of the Java Runtime only recognizes class file versions up to 61.0",
+      "env": { "lang": "java", "pkg": { "java": "17" } },
+      "tags": ["java", "jdk", "classversion"],
+      "created": "2024-01-15",
+      "solutions": [
+        {
+          "id": "jv-001-s1",
+          "body": "Class file 65 is Java 21; your runtime is Java 17. Run with JDK 21 (set JAVA_HOME) or compile with --release 17.",
+          "code": "java -version\n# either point JAVA_HOME at JDK 21, or in pom.xml:\n<maven.compiler.release>17</maven.compiler.release>",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "jv-002",
+      "title": "Spring Boot: Web server failed to start. Port 8080 was already in use.",
+      "body": "***************************\nAPPLICATION FAILED TO START\n***************************\nDescription:\nWeb server failed to start. Port 8080 was already in use.",
+      "env": { "lang": "java", "pkg": { "java": "21", "spring-boot": "3.3" } },
+      "tags": ["spring-boot", "port", "tomcat"],
+      "created": "2024-06-04",
+      "solutions": [
+        {
+          "id": "jv-002-s1",
+          "body": "Run on another port, or stop the process holding 8080.",
+          "code": "# application.properties\nserver.port=8081",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "jv-003",
+      "title": "Maven: PKIX path building failed: unable to find valid certification path",
+      "body": "Behind the corporate proxy, mvn install fails:\nsun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target",
+      "env": { "lang": "java", "pkg": { "java": "21", "maven": "3.9" } },
+      "tags": ["maven", "ssl", "proxy", "keytool"],
+      "created": "2023-08-30",
+      "solutions": [
+        {
+          "id": "jv-003-s1",
+          "body": "Import the corporate root CA into the JDK truststore used by Maven.",
+          "code": "keytool -importcert -alias corp-root -file corp-root.crt -cacerts -storepass changeit",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "jv-004",
+      "title": "Lombok on JDK 21: NoSuchFieldError JCTree$JCImport qualid",
+      "body": "Compilation fails after upgrading to JDK 21:\njava.lang.NoSuchFieldError: Class com.sun.tools.javac.tree.JCTree$JCImport does not have member field 'com.sun.tools.javac.tree.JCTree qualid'",
+      "env": { "lang": "java", "pkg": { "java": "21", "lombok": "1.18.26" } },
+      "tags": ["lombok", "java-21", "maven"],
+      "created": "2023-10-02",
+      "solutions": [
+        {
+          "id": "jv-004-s1",
+          "body": "Lombok before 1.18.30 does not support JDK 21. Upgrade Lombok.",
+          "code": "<dependency>\n  <groupId>org.projectlombok</groupId>\n  <artifactId>lombok</artifactId>\n  <version>1.18.30</version>\n</dependency>",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "dk-001",
+      "title": "permission denied while trying to connect to the Docker daemon socket",
+      "body": "docker ps fails:\nGot permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json\": dial unix /var/run/docker.sock: connect: permission denied",
+      "env": { "os": "linux", "osVer": "ubuntu 22.04", "pkg": { "docker": "26" } },
+      "tags": ["docker", "linux", "permissions"],
+      "created": "2024-02-20",
+      "solutions": [
+        {
+          "id": "dk-001-s1",
+          "body": "Add your user to the docker group and start a new login session.",
+          "code": "sudo usermod -aG docker $USER\nnewgrp docker\ndocker ps",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "dk-002",
+      "title": "Docker Desktop: WSL 2 installation is incomplete / WSL update failed",
+      "body": "Docker Desktop on Windows won't start: 'WSL 2 installation is incomplete' and later 'Docker Desktop - WSL update failed'.",
+      "env": { "os": "windows", "osVer": "11", "pkg": { "docker-desktop": "4.30" } },
+      "tags": ["docker-desktop", "wsl2", "windows"],
+      "created": "2024-05-14",
+      "solutions": [
+        {
+          "id": "dk-002-s1",
+          "body": "Update WSL and ensure the Virtual Machine Platform feature is enabled, then reboot.",
+          "steps": [
+            "Open an elevated PowerShell",
+            "wsl --update",
+            "dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart",
+            "Reboot and start Docker Desktop"
+          ],
+          "code": "wsl --update\ndism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "dk-003",
+      "title": "exec /usr/local/bin/docker-entrypoint.sh: exec format error",
+      "body": "Image built on my M2 MacBook fails on the Linux server with:\nexec /usr/local/bin/docker-entrypoint.sh: exec format error",
+      "env": { "os": "linux", "pkg": { "docker": "25" } },
+      "tags": ["docker", "buildx", "arm64", "amd64"],
+      "created": "2024-03-08",
+      "solutions": [
+        {
+          "id": "dk-003-s1",
+          "body": "The image was built for arm64 but the server is amd64. Build for the target platform with buildx.",
+          "code": "docker buildx build --platform linux/amd64 -t myapp:latest --push .",
+          "evidence": { "profile": "verified", "env": { "device": "MacBook Pro M2" } }
+        }
+      ]
+    },
+    {
+      "id": "dk-004",
+      "title": "Bind for 0.0.0.0:5432 failed: port is already allocated",
+      "body": "docker compose up fails:\nError response from daemon: driver failed programming external connectivity on endpoint db: Bind for 0.0.0.0:5432 failed: port is already allocated",
+      "env": { "pkg": { "docker": "26", "postgres": "16" } },
+      "tags": ["docker", "docker-compose", "postgres", "port"],
+      "created": "2024-09-18",
+      "solutions": [
+        {
+          "id": "dk-004-s1",
+          "body": "A local Postgres (or another container) already uses 5432. Map a different host port in docker-compose.yml.",
+          "code": "ports:\n  - \"5433:5432\"",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "dk-005",
+      "title": "Container cannot reach a service on the host via localhost",
+      "body": "My app inside a container calls http://localhost:8000 (a service running on the host) and gets:\nError: connect ECONNREFUSED 127.0.0.1:8000",
+      "env": { "pkg": { "docker": "26" } },
+      "tags": ["docker", "networking", "host.docker.internal"],
+      "created": "2024-04-23",
+      "solutions": [
+        {
+          "id": "dk-005-s1",
+          "body": "Inside a container localhost is the container itself. Use host.docker.internal to reach the host.",
+          "code": "http://host.docker.internal:8000",
+          "evidence": { "profile": "conflicting", "works": { "os": "macos" }, "fails": { "os": "linux" } }
+        },
+        {
+          "id": "dk-005-s2",
+          "body": "On Linux host.docker.internal is not defined by default; map it to the host gateway explicitly.",
+          "code": "docker run --add-host=host.docker.internal:host-gateway myapp\n# compose:\nextra_hosts:\n  - \"host.docker.internal:host-gateway\"",
+          "evidence": { "profile": "verified", "env": { "os": "linux" } }
+        }
+      ]
+    },
+    {
+      "id": "gt-001",
+      "title": "fatal: refusing to merge unrelated histories",
+      "body": "I created a repo on GitHub with a README, then tried to pull into my local project:\nfatal: refusing to merge unrelated histories",
+      "env": { "pkg": { "git": "2.43" } },
+      "tags": ["git", "merge", "github"],
+      "created": "2023-07-11",
+      "solutions": [
+        {
+          "id": "gt-001-s1",
+          "body": "Allow merging the two independent histories once.",
+          "code": "git pull origin main --allow-unrelated-histories",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "gt-002",
+      "title": "remote: Support for password authentication was removed",
+      "body": "git push asks for my GitHub password and then fails:\nremote: Support for password authentication was removed on August 13, 2021.\nfatal: Authentication failed for 'https://github.com/me/repo.git/'",
+      "env": { "pkg": { "git": "2.40" } },
+      "tags": ["git", "github", "authentication"],
+      "created": "2023-05-02",
+      "solutions": [
+        {
+          "id": "gt-002-s1",
+          "body": "Authenticate with a credential helper via the GitHub CLI (or use a personal access token / SSH).",
+          "code": "gh auth login\ngh auth setup-git\ngit push",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "gt-003",
+      "title": "Updates were rejected because the tip of your current branch is behind",
+      "body": "git push fails:\n! [rejected]        main -> main (non-fast-forward)\nerror: failed to push some refs to 'github.com:me/repo.git'\nhint: Updates were rejected because the tip of your current branch is behind its remote counterpart.",
+      "env": { "pkg": { "git": "2.44" } },
+      "tags": ["git", "push", "rebase"],
+      "created": "2024-02-27",
+      "solutions": [
+        {
+          "id": "gt-003-s1",
+          "body": "Integrate the remote commits first, then push.",
+          "code": "git pull --rebase origin main\ngit push",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "gt-003-s2",
+          "body": "Force push to overwrite the remote. Discards other people's commits; only safe on a branch nobody else uses.",
+          "code": "git push --force-with-lease",
+          "evidence": { "profile": "unverified" }
+        }
+      ]
+    },
+    {
+      "id": "gt-004",
+      "title": "/bin/sh^M: bad interpreter after cloning on Windows",
+      "body": "A shell script checked out on Windows fails in the Linux container:\n/bin/sh^M: bad interpreter: No such file or directory\nGit also warned: in the working copy of 'entrypoint.sh', LF will be replaced by CRLF",
+      "env": { "os": "windows", "pkg": { "git": "2.45" } },
+      "tags": ["git", "line-endings", "crlf", "docker"],
+      "created": "2024-06-25",
+      "solutions": [
+        {
+          "id": "gt-004-s1",
+          "body": "Force LF endings for shell scripts with .gitattributes and renormalize the working tree.",
+          "code": "echo \"*.sh text eol=lf\" >> .gitattributes\ngit add --renormalize .\ngit commit -m \"Normalize line endings\"",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "gt-005",
+      "title": "git@github.com: Permission denied (publickey)",
+      "body": "git clone over SSH fails:\ngit@github.com: Permission denied (publickey).\nfatal: Could not read from remote repository.",
+      "env": { "pkg": { "git": "2.43" } },
+      "tags": ["git", "ssh", "github"],
+      "created": "2023-06-19",
+      "solutions": [
+        {
+          "id": "gt-005-s1",
+          "body": "Create an SSH key, load it into the agent, add the public key to GitHub, and test the connection.",
+          "code": "ssh-keygen -t ed25519 -C \"you@example.com\"\nssh-add ~/.ssh/id_ed25519\n# add ~/.ssh/id_ed25519.pub at GitHub > Settings > SSH and GPG keys\nssh -T git@github.com",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "ps-001",
+      "title": "pnpm.ps1 cannot be loaded because running scripts is disabled on this system",
+      "body": "In PowerShell:\npnpm : File C:\\Users\\me\\AppData\\Roaming\\npm\\pnpm.ps1 cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies.",
+      "env": { "os": "windows", "osVer": "11", "lang": "powershell" },
+      "tags": ["powershell", "execution-policy", "npm", "pnpm"],
+      "created": "2024-08-06",
+      "solutions": [
+        {
+          "id": "ps-001-s1",
+          "body": "Allow locally installed scripts for your user only.",
+          "code": "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        }
+      ]
+    }
+  ]
+}

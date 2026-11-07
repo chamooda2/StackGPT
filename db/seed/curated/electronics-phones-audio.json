@@ -1,0 +1,424 @@
+{
+  "domain": "electronics",
+  "problems": [
+    {
+      "id": "ph-01",
+      "title": "iPhone says 'Accessory may not be supported' when charging",
+      "body": "My iPhone 13 stopped charging reliably. When I plug in the Lightning cable it often shows 'This accessory may not be supported' and charging stops and starts.",
+      "env": { "os": "ios", "osVer": "17", "device": "iPhone 13" },
+      "tags": ["iphone", "charging", "lightning"],
+      "created": "2024-03-04",
+      "solutions": [
+        {
+          "id": "ph-01-s1",
+          "body": "Pocket lint packs into the Lightning port so the plug no longer seats fully. Power off and gently scrape the port with a wooden toothpick, then try again.",
+          "steps": ["Power off the iPhone", "Shine a light into the port and look for compacted lint", "Gently scrape it out with a wooden or plastic toothpick (no metal)", "Plug in and confirm the cable clicks in fully"],
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "ph-01-s2",
+          "body": "Try a different MFi-certified cable and charger; cheap cables trigger the warning.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "ph-02",
+      "title": "Samsung Galaxy shows 'Moisture has been detected' but the phone is dry",
+      "body": "My Galaxy S22 keeps showing 'Moisture has been detected. Unplug the charger and make sure the USB port is dry' even though it has not been near water. Wired charging is blocked.",
+      "env": { "os": "android", "osVer": "14", "device": "Samsung Galaxy S22" },
+      "tags": ["samsung", "galaxy", "charging", "moisture"],
+      "created": "2024-01-29",
+      "solutions": [
+        {
+          "id": "ph-02-s1",
+          "body": "Clear the cached state of the system 'USB Settings' app, then restart.",
+          "steps": ["Settings > Apps > Filter/sort > Show system apps", "Open 'USB Settings' > Storage", "Tap Clear cache, then Clear data", "Restart the phone and plug in again"],
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "ph-02-s2",
+          "body": "Let the port air-dry for an hour and restart; meanwhile use wireless charging or charge while the phone is powered off.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "ph-03",
+      "title": "Samsung phone not fast charging with a 25W/45W charger",
+      "body": "I bought a Samsung 25W USB-C PD charger but my phone only charges slowly; it never shows 'Super fast charging'.",
+      "env": { "os": "android", "osVer": "14" },
+      "tags": ["samsung", "fast-charging", "usb-pd"],
+      "created": "2024-06-11",
+      "solutions": [
+        {
+          "id": "ph-03-s1",
+          "body": "Enable the fast charging toggles: Settings > Battery > Charging settings > turn on 'Fast charging' and 'Super fast charging'.",
+          "evidence": { "profile": "conflicting", "works": { "device": "Samsung Galaxy S24" }, "fails": { "device": "Samsung Galaxy A14" } }
+        }
+      ]
+    },
+    {
+      "id": "ph-04",
+      "title": "iPhone Personal Hotspot not showing up on Windows laptop",
+      "body": "My Windows 11 laptop can't see my iPhone's Personal Hotspot in the Wi-Fi list, although my iPad sees it.",
+      "env": { "os": "ios", "osVer": "17" },
+      "tags": ["iphone", "hotspot", "windows", "wifi"],
+      "created": "2024-02-15",
+      "solutions": [
+        {
+          "id": "ph-04-s1",
+          "body": "Turn on Settings > Personal Hotspot > 'Maximize Compatibility'. It switches the hotspot to 2.4 GHz, which older Wi-Fi adapters require.",
+          "evidence": { "profile": "conflicting", "works": { "device": "iPhone 13" }, "fails": { "device": "iPhone 11" } }
+        },
+        {
+          "id": "ph-04-s2",
+          "body": "Keep the Personal Hotspot settings screen open on the iPhone while scanning from the laptop so the network stays discoverable.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "ph-05",
+      "title": "Pixel 8 says 'Charging slowly' with a third-party fast charger",
+      "body": "My Pixel 8 shows 'Charging slowly' on a 65W USB-C laptop charger, but charges fast on the Google 30W charger.",
+      "env": { "os": "android", "osVer": "15", "device": "Google Pixel 8" },
+      "tags": ["pixel", "charging", "usb-pd", "pps"],
+      "created": "2024-11-02",
+      "solutions": [
+        {
+          "id": "ph-05-s1",
+          "body": "Pixel fast charging needs USB-C Power Delivery with PPS. Use a charger that lists PPS support and a 3A-rated USB-C to USB-C cable.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "ph-06",
+      "title": "iPhone stuck on Apple logo after iOS update",
+      "body": "After installing an iOS update my iPhone 12 boots to the Apple logo and never gets further.",
+      "env": { "os": "ios", "osVer": "18", "device": "iPhone 12" },
+      "tags": ["iphone", "boot-loop", "ios-update", "recovery-mode"],
+      "created": "2024-09-23",
+      "solutions": [
+        {
+          "id": "ph-06-s1",
+          "body": "Put the iPhone in recovery mode and choose Update (not Restore) in Finder or iTunes; this reinstalls iOS without erasing data.",
+          "steps": ["Connect the iPhone to a Mac (Finder) or PC (iTunes / Apple Devices)", "Press and release volume up, press and release volume down, then hold the side button until the recovery screen appears", "Choose Update when prompted"],
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "ph-06-s2",
+          "body": "Force restart: press and release volume up, press and release volume down, then hold the side button until the Apple logo reappears.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "ph-07",
+      "title": "Android phone shows 'No SIM card' after being dropped",
+      "body": "Since dropping my phone it intermittently shows 'No SIM card' and loses signal.",
+      "env": { "os": "android", "osVer": "14" },
+      "tags": ["android", "sim", "signal"],
+      "created": "2024-04-18",
+      "solutions": [
+        {
+          "id": "ph-07-s1",
+          "body": "Power off, remove the SIM tray, check the SIM for damage, reseat it and restart. If it keeps dropping, the SIM reader may be damaged.",
+          "evidence": { "profile": "partial" }
+        },
+        {
+          "id": "ph-07-s2",
+          "body": "Reset network settings: Settings > System > Reset options > Reset Wi-Fi, mobile & Bluetooth.",
+          "evidence": { "profile": "unverified" }
+        }
+      ]
+    },
+    {
+      "id": "ph-08",
+      "title": "Face ID is not available. Try setting up Face ID later.",
+      "body": "After a screen replacement my iPhone shows 'Face ID is not available. Try setting up Face ID later.'",
+      "env": { "os": "ios", "osVer": "17", "device": "iPhone 12 Pro" },
+      "tags": ["iphone", "face-id", "repair"],
+      "created": "2024-05-06",
+      "solutions": [
+        {
+          "id": "ph-08-s1",
+          "body": "Reset Face ID in Settings > Face ID & Passcode and update iOS. If the message persists, the TrueDepth flex cable was likely damaged during the repair and needs an Apple-authorized repair.",
+          "evidence": { "profile": "failing" }
+        }
+      ]
+    },
+    {
+      "id": "ph-09",
+      "title": "Android Auto keeps disconnecting while driving",
+      "body": "Android Auto randomly disconnects every few minutes with a wired connection.",
+      "env": { "os": "android", "osVer": "14", "device": "Samsung Galaxy S23" },
+      "tags": ["android-auto", "usb", "car"],
+      "created": "2024-03-21",
+      "solutions": [
+        {
+          "id": "ph-09-s1",
+          "body": "Replace the cable with a short (under 1 m), good-quality USB data cable and plug it into the car's data port, not a charge-only port.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "ph-09-s2",
+          "body": "Clear the Android Auto app cache and forget/re-add the car in Android Auto settings.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "ph-10",
+      "title": "iPad shows 'Not Charging' when plugged into MacBook",
+      "body": "My iPad Air shows 'Not Charging' next to the battery when plugged into my MacBook's USB-C port.",
+      "env": { "os": "ipados", "osVer": "17", "device": "iPad Air (5th gen)" },
+      "tags": ["ipad", "charging", "usb-c"],
+      "created": "2023-12-12",
+      "solutions": [
+        {
+          "id": "ph-10-s1",
+          "body": "The computer port can't supply enough power while the iPad is in use. Charge from a 20W or higher USB-C wall charger.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "ph-11",
+      "title": "Galaxy phone notifications arrive late or only when screen is turned on",
+      "body": "WhatsApp and Gmail notifications on my Galaxy S23 arrive minutes late, often only when I unlock the phone.",
+      "env": { "os": "android", "osVer": "14", "device": "Samsung Galaxy S23" },
+      "tags": ["samsung", "notifications", "battery-optimization"],
+      "created": "2024-07-15",
+      "solutions": [
+        {
+          "id": "ph-11-s1",
+          "body": "Exclude the apps from battery optimization: Settings > Battery > Background usage limits > Never sleeping apps > add the apps, and set each app's battery usage to Unrestricted.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "ph-12",
+      "title": "iPhone battery draining fast after iOS update",
+      "body": "Since updating iOS my battery drops much faster than before.",
+      "env": { "os": "ios", "osVer": "18", "device": "iPhone 14" },
+      "tags": ["iphone", "battery", "ios-update"],
+      "created": "2024-10-01",
+      "solutions": [
+        {
+          "id": "ph-12-s1",
+          "body": "Wait 48 hours after the update; indexing and photo analysis run in the background and settle down.",
+          "evidence": { "profile": "partial" }
+        },
+        {
+          "id": "ph-12-s2",
+          "body": "Check Settings > Battery for the top apps and turn off Background App Refresh for heavy ones.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-01",
+      "title": "AirPods: only one side is playing sound",
+      "body": "Only my left AirPod plays audio; the right one connects but is silent.",
+      "env": { "device": "AirPods Pro (2nd gen)" },
+      "tags": ["airpods", "bluetooth", "audio"],
+      "created": "2024-02-08",
+      "solutions": [
+        {
+          "id": "au-01-s1",
+          "body": "Reset the AirPods and pair them again.",
+          "steps": ["Put both AirPods in the case and close the lid for 30 seconds", "Forget the AirPods in Bluetooth settings", "Open the lid and hold the setup button on the case for about 15 seconds until the light flashes amber, then white", "Pair again"],
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "au-01-s2",
+          "body": "Clean the speaker mesh of the silent AirPod with a dry soft brush; earwax can block it completely.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-02",
+      "title": "Bluetooth headset audio becomes terrible during calls on Windows",
+      "body": "When I join a Teams call with my Bluetooth earbuds on Windows 11, music quality drops to a muffled, tinny sound.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["bluetooth", "windows", "hfp", "microphone"],
+      "created": "2023-11-20",
+      "solutions": [
+        {
+          "id": "au-02-s1",
+          "body": "Using the earbuds' microphone forces the low-bandwidth Hands-Free profile. Use the laptop's built-in or a USB microphone as input and keep the earbuds as the 'Headphones' (stereo) output device.",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        },
+        {
+          "id": "au-02-s2",
+          "body": "Disable the 'Hands-Free Telephony' service in the device's Bluetooth properties (Control Panel > Devices and Printers > device > Services). Keeps stereo audio but the earbuds' mic stops working.",
+          "evidence": { "profile": "partial", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "au-03",
+      "title": "Sony WH-1000XM4 won't connect to laptop and phone at the same time",
+      "body": "When my phone is connected, my laptop can't connect to the Sony WH-1000XM4 until I disconnect the phone.",
+      "env": { "device": "Sony WH-1000XM4" },
+      "tags": ["sony", "headphones", "multipoint", "bluetooth"],
+      "created": "2023-10-10",
+      "solutions": [
+        {
+          "id": "au-03-s1",
+          "body": "Enable multipoint in the Sony Headphones Connect app: System > 'Connect to 2 devices simultaneously'. Note LDAC is not available while multipoint is on.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "au-04",
+      "title": "Bluetooth headphones audio stutters on Windows 11 laptop",
+      "body": "Audio over Bluetooth headphones cuts out every few seconds on my Windows 11 laptop, especially when Wi-Fi is busy.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["bluetooth", "windows", "stutter", "power-management"],
+      "created": "2024-04-02",
+      "solutions": [
+        {
+          "id": "au-04-s1",
+          "body": "In Device Manager > Bluetooth > your adapter > Power Management, untick 'Allow the computer to turn off this device to save power'.",
+          "evidence": { "profile": "conflicting", "works": { "device": "Intel Wi-Fi 6 AX201" }, "fails": { "device": "Realtek RTL8852BE" } }
+        },
+        {
+          "id": "au-04-s2",
+          "body": "Install the latest Bluetooth driver from the laptop manufacturer's support page instead of the Windows Update driver.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-05",
+      "title": "Galaxy Buds2 Pro: one earbud doesn't charge in the case",
+      "body": "The right earbud's battery stays at the same level after hours in the case; its LED doesn't light.",
+      "env": { "device": "Samsung Galaxy Buds2 Pro" },
+      "tags": ["galaxy-buds", "charging", "earbuds"],
+      "created": "2024-05-19",
+      "solutions": [
+        {
+          "id": "au-05-s1",
+          "body": "Clean the charging contacts on the earbud and inside the case with a cotton swab and a little isopropyl alcohol, let dry, and reseat.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "au-06",
+      "title": "Sonos app says 'Unable to connect to Sonos' after changing router",
+      "body": "I replaced my router and now the Sonos app can't find my speakers.",
+      "env": { "device": "Sonos One" },
+      "tags": ["sonos", "wifi", "router"],
+      "created": "2024-08-27",
+      "solutions": [
+        {
+          "id": "au-06-s1",
+          "body": "Connect one speaker to the router with an Ethernet cable, open the app, then update the Wi-Fi credentials under Settings > System > Network. Unplug the cable afterwards.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "au-06-s2",
+          "body": "Rename the new router's network to the old SSID and password so the speakers rejoin automatically.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-07",
+      "title": "Echo Dot shows 'Device is unresponsive' in Alexa app",
+      "body": "My Echo Dot has an orange light ring and the Alexa app lists it as 'Device is unresponsive'.",
+      "env": { "device": "Amazon Echo Dot (5th gen)" },
+      "tags": ["alexa", "echo", "wifi"],
+      "created": "2024-01-06",
+      "solutions": [
+        {
+          "id": "au-07-s1",
+          "body": "Re-run setup: in the Alexa app go to Devices > Echo & Alexa > your device > Change Wi-Fi network, and make sure the Echo is joining a 2.4 GHz or dual-band network.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "au-07-s2",
+          "body": "Unplug the Echo and the router for 30 seconds and power them back on.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-08",
+      "title": "No sound from wired headphones via USB-C dongle on Pixel",
+      "body": "I bought a cheap USB-C to 3.5mm adapter for my Pixel 8, but my wired headphones are silent.",
+      "env": { "os": "android", "device": "Google Pixel 8" },
+      "tags": ["pixel", "usb-c", "headphones", "dac"],
+      "created": "2024-03-13",
+      "solutions": [
+        {
+          "id": "au-08-s1",
+          "body": "Pixels don't output analog audio over USB-C, so passive adapters don't work. Use an adapter with a built-in DAC (active adapter), such as Google's own.",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "au-09",
+      "title": "No sound on TV when PC is connected via HDMI",
+      "body": "The picture shows on my TV over HDMI, but the sound still comes from the laptop speakers or not at all.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["hdmi", "audio", "windows", "tv"],
+      "created": "2023-09-25",
+      "solutions": [
+        {
+          "id": "au-09-s1",
+          "body": "Select the TV as the output device: Settings > System > Sound > Output > choose the TV/HDMI device.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "au-09-s2",
+          "body": "Update the graphics driver, which includes the HDMI audio driver.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-10",
+      "title": "Laptop speakers crackle after Windows update",
+      "body": "After a Windows 11 update my laptop speakers crackle and pop during playback.",
+      "env": { "os": "windows", "osVer": "11" },
+      "tags": ["audio", "windows", "crackling"],
+      "created": "2024-02-02",
+      "solutions": [
+        {
+          "id": "au-10-s1",
+          "body": "Turn off audio enhancements: Settings > System > Sound > Speakers > Audio enhancements > Off.",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "au-10-s2",
+          "body": "Change the default format to 24 bit, 48000 Hz in the speaker's advanced properties.",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "au-11",
+      "title": "AirPods sound low quality on Mac during video calls",
+      "body": "On my Mac, AirPods sound muffled as soon as I join a Zoom call.",
+      "env": { "os": "macos", "osVer": "14", "device": "AirPods (3rd gen)" },
+      "tags": ["airpods", "macos", "zoom", "microphone"],
+      "created": "2024-06-28",
+      "solutions": [
+        {
+          "id": "au-11-s1",
+          "body": "Set the Mac's built-in microphone as the input (System Settings > Sound > Input, and in the call app). The AirPods then stay in high-quality stereo mode.",
+          "evidence": { "profile": "verified", "env": { "os": "macos" } }
+        }
+      ]
+    }
+  ]
+}

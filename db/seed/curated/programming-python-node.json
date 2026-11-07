@@ -1,0 +1,324 @@
+{
+  "domain": "programming",
+  "problems": [
+    {
+      "id": "py-001",
+      "title": "ModuleNotFoundError: No module named 'requests' after pip install",
+      "body": "I ran pip install requests and it says 'Requirement already satisfied', but running my script still fails with:\nTraceback (most recent call last):\n  File \"app.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\nI am running the script from VS Code.",
+      "env": { "lang": "python", "pkg": { "python": "3.12" } },
+      "tags": ["python", "pip", "virtualenv", "vscode"],
+      "created": "2024-02-12",
+      "solutions": [
+        {
+          "id": "py-001-s1",
+          "body": "pip and python point at different interpreters. Install with the same interpreter that runs the script, and select that interpreter (or your venv) in VS Code.",
+          "steps": [
+            "Print the interpreter running the script: python -c \"import sys; print(sys.executable)\"",
+            "Install using that exact interpreter: python -m pip install requests",
+            "In VS Code run 'Python: Select Interpreter' and pick the same interpreter or .venv",
+            "Re-run the script"
+          ],
+          "code": "python -c \"import sys; print(sys.executable)\"\npython -m pip install requests",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "py-002",
+      "title": "pip install fails with error: externally-managed-environment",
+      "body": "On Ubuntu 24.04, pip install fails:\nerror: externally-managed-environment\n× This environment is externally managed\n╰─> To install Python packages system-wide, try apt install python3-xyz\nHow do I install packages now?",
+      "env": { "os": "linux", "osVer": "ubuntu 24.04", "lang": "python", "pkg": { "python": "3.12" } },
+      "tags": ["python", "pip", "ubuntu", "pep668"],
+      "created": "2024-05-03",
+      "solutions": [
+        {
+          "id": "py-002-s1",
+          "body": "PEP 668 marks the system Python as managed by apt. Create a virtual environment for your project and install packages inside it.",
+          "steps": [
+            "sudo apt install python3-venv",
+            "python3 -m venv .venv",
+            "source .venv/bin/activate",
+            "pip install <package>"
+          ],
+          "code": "sudo apt install python3-venv\npython3 -m venv .venv\nsource .venv/bin/activate\npip install requests",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "py-002-s2",
+          "body": "Force the install into the system interpreter with --break-system-packages. It works but can break apt-managed tools; prefer a venv or pipx.",
+          "code": "pip install --break-system-packages requests",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "py-003",
+      "title": "A module that was compiled using NumPy 1.x cannot be run in NumPy 2.0.0",
+      "body": "After upgrading packages, importing pandas crashes:\nA module that was compiled using NumPy 1.x cannot be run in\nNumPy 2.0.0 as it may crash. To support both 1.x and 2.x versions of NumPy, modules must be compiled with NumPy 2.0.\nImportError: numpy.core.multiarray failed to import",
+      "env": { "lang": "python", "pkg": { "python": "3.11", "numpy": "2.0.0", "pandas": "2.1.4" } },
+      "tags": ["python", "numpy", "pandas"],
+      "created": "2024-06-17",
+      "solutions": [
+        {
+          "id": "py-003-s1",
+          "body": "Upgrade the package that was built against NumPy 1.x to a release built for NumPy 2 (pandas 2.2.2 or newer).",
+          "code": "python -m pip install --upgrade \"pandas>=2.2.2\"",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "py-003-s2",
+          "body": "Pin NumPy below 2 until all dependencies support it.",
+          "code": "python -m pip install \"numpy<2\"",
+          "evidence": { "profile": "outdated" }
+        }
+      ]
+    },
+    {
+      "id": "py-004",
+      "title": "SSL: CERTIFICATE_VERIFY_FAILED on macOS with python.org installer",
+      "body": "urllib and requests fail with:\nssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)\nPython was installed from the python.org .pkg installer.",
+      "env": { "os": "macos", "osVer": "14", "lang": "python", "pkg": { "python": "3.12" } },
+      "tags": ["python", "ssl", "macos", "certificates"],
+      "created": "2024-01-22",
+      "solutions": [
+        {
+          "id": "py-004-s1",
+          "body": "The python.org macOS build does not use the system keychain. Run the bundled 'Install Certificates.command' to install certifi's CA bundle.",
+          "steps": [
+            "Open Finder > Applications > Python 3.12",
+            "Double-click 'Install Certificates.command'",
+            "Re-run your script"
+          ],
+          "code": "open \"/Applications/Python 3.12/Install Certificates.command\"",
+          "evidence": { "profile": "verified", "env": { "os": "macos" } }
+        }
+      ]
+    },
+    {
+      "id": "py-005",
+      "title": "'pip' is not recognized as an internal or external command",
+      "body": "On Windows 11, running pip in Command Prompt prints:\n'pip' is not recognized as an internal or external command,\noperable program or batch file.\nPython itself is installed.",
+      "env": { "os": "windows", "osVer": "11", "lang": "python", "pkg": { "python": "3.12" } },
+      "tags": ["python", "pip", "windows", "path"],
+      "created": "2023-11-08",
+      "solutions": [
+        {
+          "id": "py-005-s1",
+          "body": "Use the Python launcher, which is always on PATH, to run pip as a module. To fix the PATH permanently, re-run the installer and tick 'Add python.exe to PATH'.",
+          "code": "py -m pip install requests",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "py-006",
+      "title": "UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d",
+      "body": "Reading a text file works on my Mac but on Windows fails with:\nUnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 1523: character maps to <undefined>",
+      "env": { "os": "windows", "lang": "python", "pkg": { "python": "3.11" } },
+      "tags": ["python", "unicode", "windows", "encoding"],
+      "created": "2023-09-14",
+      "solutions": [
+        {
+          "id": "py-006-s1",
+          "body": "On Windows open() defaults to the ANSI code page (cp1252). Pass the encoding explicitly.",
+          "code": "with open(\"data.txt\", encoding=\"utf-8\") as f:\n    text = f.read()",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "py-006-s2",
+          "body": "Enable Python UTF-8 mode globally so the default encoding is UTF-8. Fixes your code but not third-party code that hard-codes another encoding.",
+          "code": "setx PYTHONUTF8 1",
+          "evidence": { "profile": "partial", "env": { "os": "windows" } }
+        }
+      ]
+    },
+    {
+      "id": "py-007",
+      "title": "error: Microsoft Visual C++ 14.0 or greater is required",
+      "body": "pip install fails while building a wheel:\nerror: Microsoft Visual C++ 14.0 or greater is required. Get it with \"Microsoft C++ Build Tools\": https://visualstudio.microsoft.com/visual-cpp-build-tools/\nERROR: Failed building wheel",
+      "env": { "os": "windows", "lang": "python" },
+      "tags": ["python", "pip", "windows", "wheel"],
+      "created": "2024-10-28",
+      "solutions": [
+        {
+          "id": "py-007-s1",
+          "body": "Install the Build Tools for Visual Studio with the 'Desktop development with C++' workload, then retry the install.",
+          "steps": [
+            "Download 'Build Tools for Visual Studio'",
+            "Select the 'Desktop development with C++' workload and install",
+            "Open a new terminal and re-run pip install"
+          ],
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        },
+        {
+          "id": "py-007-s2",
+          "body": "Use a Python version the package ships prebuilt wheels for, so nothing has to be compiled.",
+          "code": "py -3.11 -m pip install <package>",
+          "evidence": { "profile": "conflicting", "works": { "pkg": { "python": "3.11" } }, "fails": { "pkg": { "python": "3.13" } } }
+        }
+      ]
+    },
+    {
+      "id": "py-008",
+      "title": "django.db.utils.OperationalError: no such table",
+      "body": "Opening the admin page raises:\ndjango.db.utils.OperationalError: no such table: blog_post\nI just added the Post model.",
+      "env": { "lang": "python", "pkg": { "python": "3.12", "django": "5.0" } },
+      "tags": ["python", "django", "migrations", "sqlite"],
+      "created": "2024-03-30",
+      "solutions": [
+        {
+          "id": "py-008-s1",
+          "body": "The table was never created. Generate and apply migrations for the app.",
+          "code": "python manage.py makemigrations blog\npython manage.py migrate",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "js-001",
+      "title": "Error: Cannot find module 'express'",
+      "body": "node server.js fails with:\nError: Cannot find module 'express'\nRequire stack:\n- /home/me/app/server.js\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1145:15)\n  code: 'MODULE_NOT_FOUND'",
+      "env": { "lang": "javascript", "pkg": { "node": "20" } },
+      "tags": ["node.js", "npm", "express"],
+      "created": "2024-04-10",
+      "solutions": [
+        {
+          "id": "js-001-s1",
+          "body": "Dependencies are not installed in this project folder. Run npm install from the folder containing package.json (or add express if it is missing).",
+          "code": "cd /path/to/app\nnpm install\nnpm install express",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "js-002",
+      "title": "Error: listen EADDRINUSE: address already in use :::3000",
+      "body": "Starting my Node dev server fails:\nError: listen EADDRINUSE: address already in use :::3000\nNothing else should be running.",
+      "env": { "lang": "javascript", "pkg": { "node": "20" } },
+      "tags": ["node.js", "port", "eaddrinuse"],
+      "created": "2024-07-02",
+      "solutions": [
+        {
+          "id": "js-002-s1",
+          "body": "Find and kill the process holding the port on Windows.",
+          "code": "netstat -ano | findstr :3000\ntaskkill /PID <pid> /F",
+          "evidence": { "profile": "verified", "env": { "os": "windows" } }
+        },
+        {
+          "id": "js-002-s2",
+          "body": "Find and kill the process holding the port on macOS or Linux.",
+          "code": "lsof -i :3000\nkill -9 <pid>",
+          "evidence": { "profile": "verified", "env": { "os": "macos" } }
+        }
+      ]
+    },
+    {
+      "id": "js-003",
+      "title": "npm ERR! code ERESOLVE unable to resolve dependency tree",
+      "body": "npm install fails:\nnpm ERR! code ERESOLVE\nnpm ERR! ERESOLVE unable to resolve dependency tree\nnpm ERR! Could not resolve dependency:\nnpm ERR! peer react@\"^17.0.0\" from some-ui-lib@2.3.0",
+      "env": { "lang": "javascript", "pkg": { "node": "20", "npm": "10", "react": "18.2.0" } },
+      "tags": ["npm", "peer-dependencies", "react"],
+      "created": "2023-12-05",
+      "solutions": [
+        {
+          "id": "js-003-s1",
+          "body": "Upgrade the library to a version whose peer range includes your React version, so the tree resolves cleanly.",
+          "code": "npm view some-ui-lib peerDependencies\nnpm install some-ui-lib@latest",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "js-003-s2",
+          "body": "Skip peer dependency resolution. Install succeeds but you may hit runtime errors if the library truly needs the older React.",
+          "code": "npm install --legacy-peer-deps",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "js-004",
+      "title": "SyntaxError: Cannot use import statement outside a module",
+      "body": "Running node index.js:\nimport express from 'express';\n^^^^^^\nSyntaxError: Cannot use import statement outside a module",
+      "env": { "lang": "javascript", "pkg": { "node": "20" } },
+      "tags": ["node.js", "esm", "modules"],
+      "created": "2023-10-19",
+      "solutions": [
+        {
+          "id": "js-004-s1",
+          "body": "Tell Node the package uses ES modules by adding \"type\": \"module\" to package.json, or rename the file to .mjs.",
+          "code": "{\n  \"type\": \"module\"\n}",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "js-005",
+      "title": "Error: error:0308010C:digital envelope routines::unsupported",
+      "body": "npm start on an older Create React App project fails on Node 18:\nError: error:0308010C:digital envelope routines::unsupported\n  opensslErrorStack: [ 'error:03000086:digital envelope routines::initialization error' ],\n  library: 'digital envelope routines',\n  code: 'ERR_OSSL_EVP_UNSUPPORTED'",
+      "env": { "lang": "javascript", "pkg": { "node": "18", "react-scripts": "4.0.3" } },
+      "tags": ["node.js", "webpack", "openssl", "create-react-app"],
+      "created": "2023-03-15",
+      "solutions": [
+        {
+          "id": "js-005-s1",
+          "body": "Upgrade to webpack 5 based tooling (react-scripts 5), which no longer uses the MD4 hash removed in OpenSSL 3.",
+          "code": "npm install react-scripts@5",
+          "evidence": { "profile": "verified" }
+        },
+        {
+          "id": "js-005-s2",
+          "body": "Re-enable legacy OpenSSL algorithms. Works as a stopgap but keeps you on an unsupported build setup.",
+          "code": "export NODE_OPTIONS=--openssl-legacy-provider\nnpm start",
+          "evidence": { "profile": "partial" }
+        }
+      ]
+    },
+    {
+      "id": "js-006",
+      "title": "npm ERR! code EACCES permission denied, mkdir '/usr/local/lib/node_modules'",
+      "body": "npm install -g fails:\nnpm ERR! code EACCES\nnpm ERR! syscall mkdir\nnpm ERR! path /usr/local/lib/node_modules/typescript\nnpm ERR! Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/typescript'",
+      "env": { "os": "linux", "lang": "javascript", "pkg": { "node": "20" } },
+      "tags": ["npm", "permissions", "global-install"],
+      "created": "2024-08-21",
+      "solutions": [
+        {
+          "id": "js-006-s1",
+          "body": "Don't use sudo. Install Node with a version manager (nvm) so global packages live in your home directory.",
+          "code": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash\nnvm install --lts\nnpm install -g typescript",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "js-007",
+      "title": "Blocked by CORS policy: No 'Access-Control-Allow-Origin' header",
+      "body": "My React app at localhost:5173 calls my Express API at localhost:3000 and the browser shows:\nAccess to fetch at 'http://localhost:3000/api' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "env": { "lang": "javascript", "pkg": { "node": "20", "express": "4.19" } },
+      "tags": ["cors", "express", "fetch"],
+      "created": "2024-05-27",
+      "solutions": [
+        {
+          "id": "js-007-s1",
+          "body": "CORS must be allowed by the server. Add the cors middleware to Express and allow your frontend origin.",
+          "code": "import cors from 'cors';\napp.use(cors({ origin: 'http://localhost:5173' }));",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    },
+    {
+      "id": "js-008",
+      "title": "TypeError: Cannot read properties of undefined (reading 'map')",
+      "body": "My React component crashes on first render:\nTypeError: Cannot read properties of undefined (reading 'map')\nThe data comes from a fetch in useEffect.",
+      "env": { "lang": "javascript", "pkg": { "react": "18.3" } },
+      "tags": ["react", "javascript", "useeffect"],
+      "created": "2024-09-09",
+      "solutions": [
+        {
+          "id": "js-008-s1",
+          "body": "The first render happens before the fetch resolves. Initialise the state to an empty array (or guard with optional chaining).",
+          "code": "const [items, setItems] = useState([]);\n// or\n{items?.map(i => <li key={i.id}>{i.name}</li>)}",
+          "evidence": { "profile": "verified" }
+        }
+      ]
+    }
+  ]
+}
