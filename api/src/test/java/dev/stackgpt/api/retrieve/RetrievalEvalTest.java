@@ -19,13 +19,13 @@ import dev.stackgpt.api.extract.RuleExtractor;
  * End-to-end retrieval quality on the seeded, backfilled DB (docker compose db on :5433).
  * Paraphrased user questions must find their curated problem in the top 3. Skipped when the DB is unavailable.
  */
-class RetrievalEvalTest {
+public class RetrievalEvalTest {
 	static final String URL = "jdbc:postgresql://localhost:5433/stackgpt";
 	static JdbcTemplate jdbc;
 
-	record Case(String question, String expected) {}
+	public record Case(String question, String expected) {}
 
-	static final List<Case> CASES = List.of(
+	public static final List<Case> CASES = List.of(
 			new Case("I'm on Ubuntu 24.04 and pip install requests gives error: externally-managed-environment. How do I fix it?", "py-002"),
 			new Case("node server won't start: Error: listen EADDRINUSE: address already in use :::8080", "js-002"),
 			new Case("My AirPods only play sound in the left ear, the right one is silent", "au-01"),

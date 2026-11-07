@@ -46,6 +46,10 @@ export interface Solution {
   accepted: boolean;
   source: Source;
   outcomes: Outcomes;
+  /** Outcomes reported from setups like the user's; null when none are comparable. */
+  yourEnv: Outcomes | null;
+  conflicts: string[];
+  answerSimilarity: number | null;
 }
 
 export interface Match {
@@ -55,14 +59,27 @@ export interface Match {
   score: number;
   similarity: number | null;
   ranks: { vector: number | null; text: number | null; errorSig: number | null };
+  /** Environment fit in [0,1], 0.5 = nothing comparable; conflicts are hard mismatches. */
+  fit: { score: number; conflicts: string[] };
   env: Env;
   errorSigs: string[];
   source: Source;
   solutions: Solution[];
 }
 
+export type Verdict = 'matches' | 'partial' | 'novel';
+
+export interface Alignment {
+  verdict: Verdict;
+  problemId: number | null;
+  solutionId: number | null;
+  similarity: number | null;
+}
+
 export interface VerifyResponse {
   query: { statement: string; errorSigs: string[]; env: Env };
+  /** null when no answer text was sent. */
+  alignment: Alignment | null;
   matches: Match[];
 }
 

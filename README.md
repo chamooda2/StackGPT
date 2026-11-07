@@ -55,6 +55,18 @@ shell (the manifest's host permission follows it).
 
 All chatgpt.com DOM assumptions live in `extension/src/lib/chatgpt.ts`.
 
+## Context matching and answer alignment (build step 4)
+
+- **ContextMatcher**: per problem, a weighted environment fit (OS, device, language, OS/package versions)
+  that nudges ranking by at most ±10%; an OS you name that differs from the problem's is a hard conflict
+  (flagged and demoted). The browser's OS is only a weak hint. Per solution: outcomes "in setups like
+  yours", fixes whose reports all come from another OS, and fixes that mostly fail in your setup while
+  working elsewhere (e.g. model-specific).
+- **SolutionAligner**: embeds the answer's steps + code (prose if neither) and compares it with stored
+  solutions of the top related problems: `matches` (≥ 0.78), `partial` (≥ 0.70) or `novel`.
+- Matches below 0.70 question similarity are dropped unless an error signature matched exactly.
+- Thresholds were calibrated on the seeded corpus; `VerifyEvalTest` prints the similarities behind them.
+
 ### API response
 
 `/v1/verify` returns the extracted query (statement, error signatures, env facets merged with `envHints`) and

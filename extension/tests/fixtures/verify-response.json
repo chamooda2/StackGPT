@@ -1,222 +1,81 @@
 {
+  "alignment": {
+    "problemId": 41, 
+    "solutionId": 57, 
+    "verdict": "matches", 
+    "similarity": 0.812502717599195
+  }, 
   "query": {
-    "statement": "pip install fails on Ubuntu 24.04 with error: externally-managed-environment", 
-    "errorSigs": [
-      "externally-managed-environment"
-    ], 
+    "statement": "My Samsung Galaxy A14 won't super fast charge even though I bought a 25W Samsung charger. How do I enable it?", 
+    "errorSigs": [], 
     "env": {
+      "os": "android", 
       "clientOs": "windows", 
-      "osVer": "ubuntu 24.04", 
-      "os": "linux", 
-      "lang": "python"
+      "device": "Samsung Galaxy A14"
     }
   }, 
   "matches": [
     {
-      "score": 0.04918032786885246, 
+      "problemId": 41, 
+      "title": "Samsung phone not fast charging with a 25W/45W charger", 
       "env": {
-        "pkg": {
-          "python": "3.12"
-        }, 
-        "osVer": "ubuntu 24.04", 
-        "os": "linux", 
-        "lang": "python"
+        "osVer": "14", 
+        "os": "android"
       }, 
-      "title": "pip install fails with error: externally-managed-environment", 
-      "solutions": [
-        {
-          "score": null, 
-          "source": {
-            "id": "py-002-s1", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
-            "author": "StackGPT curators", 
-            "name": "curated", 
-            "url": null
-          }, 
-          "steps": [
-            "sudo apt install python3-venv", 
-            "python3 -m venv .venv", 
-            "source .venv/bin/activate", 
-            "pip install <package>"
-          ], 
-          "id": 108, 
-          "code": "sudo apt install python3-venv\npython3 -m venv .venv\nsource .venv/bin/activate\npip install requests", 
-          "outcomes": {
-            "lastAttempt": "2026-10-31T00:50:52.993754Z", 
-            "worked": 19, 
-            "failed": 0, 
-            "synthetic": 20, 
-            "partial": 1
-          }, 
-          "body": "PEP 668 marks the system Python as managed by apt. Create a virtual environment for your project and install packages inside it.", 
-          "accepted": false
-        }, 
-        {
-          "score": null, 
-          "source": {
-            "id": "py-002-s2", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
-            "author": "StackGPT curators", 
-            "name": "curated", 
-            "url": null
-          }, 
-          "steps": [], 
-          "id": 109, 
-          "code": "pip install --break-system-packages requests", 
-          "outcomes": {
-            "lastAttempt": "2026-10-28T00:50:52.993754Z", 
-            "worked": 5, 
-            "failed": 3, 
-            "synthetic": 12, 
-            "partial": 4
-          }, 
-          "body": "Force the install into the system interpreter with --break-system-packages. It works but can break apt-managed tools; prefer a venv or pipx.", 
-          "accepted": false
-        }
-      ], 
-      "errorSigs": [
-        "externally-managed-environment"
-      ], 
+      "score": 0.03475409836065574, 
+      "domain": "electronics", 
       "source": {
-        "id": "py-002", 
-        "license": "StackGPT PoC curated content; attempts are synthetic", 
         "author": "StackGPT curators", 
+        "license": "StackGPT PoC curated content; attempts are synthetic", 
         "name": "curated", 
+        "id": "ph-03", 
         "url": null
       }, 
-      "domain": "programming", 
-      "problemId": 78, 
-      "similarity": 0.9405538475184158, 
-      "ranks": {
-        "text": 1, 
-        "errorSig": 1, 
-        "vector": 1
-      }
-    }, 
-    {
-      "score": 0.031754032258064516, 
-      "env": {
-        "pkg": {
-          "python": "3.12"
-        }, 
-        "osVer": "11", 
-        "os": "windows", 
-        "lang": "python"
+      "fit": {
+        "score": 0.8, 
+        "conflicts": []
       }, 
-      "title": "'pip' is not recognized as an internal or external command", 
+      "similarity": 0.7475149637425245, 
       "solutions": [
         {
-          "score": null, 
-          "source": {
-            "id": "py-005-s1", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
-            "author": "StackGPT curators", 
-            "name": "curated", 
-            "url": null
-          }, 
+          "answerSimilarity": 0.812502717599195, 
           "steps": [], 
-          "id": 113, 
-          "code": "py -m pip install requests", 
-          "outcomes": {
-            "lastAttempt": "2026-11-02T00:50:52.993754Z", 
-            "worked": 19, 
-            "failed": 0, 
-            "synthetic": 20, 
-            "partial": 1
-          }, 
-          "body": "Use the Python launcher, which is always on PATH, to run pip as a module. To fix the PATH permanently, re-run the installer and tick 'Add python.exe to PATH'.", 
-          "accepted": false
-        }
-      ], 
-      "errorSigs": [], 
-      "source": {
-        "id": "py-005", 
-        "license": "StackGPT PoC curated content; attempts are synthetic", 
-        "author": "StackGPT curators", 
-        "name": "curated", 
-        "url": null
-      }, 
-      "domain": "programming", 
-      "problemId": 81, 
-      "similarity": 0.7191073968154642, 
-      "ranks": {
-        "text": 4, 
-        "errorSig": null, 
-        "vector": 2
-      }
-    }, 
-    {
-      "score": 0.03125763125763126, 
-      "env": {
-        "os": "windows", 
-        "lang": "python"
-      }, 
-      "title": "error: Microsoft Visual C++ 14.0 or greater is required", 
-      "solutions": [
-        {
           "score": null, 
           "source": {
-            "id": "py-007-s1", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
             "author": "StackGPT curators", 
+            "license": "StackGPT PoC curated content; attempts are synthetic", 
             "name": "curated", 
+            "id": "ph-03-s1", 
             "url": null
           }, 
-          "steps": [
-            "Download 'Build Tools for Visual Studio'", 
-            "Select the 'Desktop development with C++' workload and install", 
-            "Open a new terminal and re-run pip install"
-          ], 
-          "id": 116, 
-          "code": null, 
+          "body": "Enable the fast charging toggles: Settings > Battery > Charging settings > turn on 'Fast charging' and 'Super fast charging'.", 
           "outcomes": {
+            "partial": 1, 
             "lastAttempt": "2026-10-26T00:50:52.993754Z", 
-            "worked": 19, 
-            "failed": 0, 
-            "synthetic": 20, 
-            "partial": 1
-          }, 
-          "body": "Install the Build Tools for Visual Studio with the 'Desktop development with C++' workload, then retry the install.", 
-          "accepted": false
-        }, 
-        {
-          "score": null, 
-          "source": {
-            "id": "py-007-s2", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
-            "author": "StackGPT curators", 
-            "name": "curated", 
-            "url": null
-          }, 
-          "steps": [], 
-          "id": 117, 
-          "code": "py -3.11 -m pip install <package>", 
-          "outcomes": {
-            "lastAttempt": "2026-11-01T00:50:52.993754Z", 
             "worked": 10, 
             "failed": 9, 
-            "synthetic": 20, 
-            "partial": 1
+            "synthetic": 20
           }, 
-          "body": "Use a Python version the package ships prebuilt wheels for, so nothing has to be compiled.", 
-          "accepted": false
+          "code": null, 
+          "id": 57, 
+          "accepted": false, 
+          "yourEnv": {
+            "partial": 1, 
+            "lastAttempt": null, 
+            "worked": 1, 
+            "failed": 8, 
+            "synthetic": 10
+          }, 
+          "conflicts": [
+            "Mostly fails in setups like yours (Samsung Galaxy A14) but works in others"
+          ]
         }
       ], 
       "errorSigs": [], 
-      "source": {
-        "id": "py-007", 
-        "license": "StackGPT PoC curated content; attempts are synthetic", 
-        "author": "StackGPT curators", 
-        "name": "curated", 
-        "url": null
-      }, 
-      "domain": "programming", 
-      "problemId": 83, 
-      "similarity": 0.6900789284518132, 
       "ranks": {
-        "text": 5, 
         "errorSig": null, 
-        "vector": 3
+        "vector": 1, 
+        "text": 1
       }
     }
   ]
