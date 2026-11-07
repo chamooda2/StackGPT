@@ -1,41 +1,41 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { chatgpt, SEL } from '../src/lib/chatgpt';
-import html from './fixtures/chatgpt-conversation.html?raw';
+import html from './fixtures/chatgpt-current.html?raw';
 
 beforeEach(() => {
+  document.documentElement.className = '';
   document.body.innerHTML = html;
 });
 
 const answer = (id: string) => chatgpt.answers(document).find(a => a.id === id)!;
 
-describe('ChatGptAdapter on fixture HTML', () => {
-  it('finds real answers in order and skips the slug-less Thinking pseudo-message', () => {
+describe('ChatGptAdapter on the current layout', () => {
+  it('finds answers in the active conversation only, skipping units without a message id', () => {
     expect(chatgpt.answers(document).map(a => a.id)).toEqual(['a1', 'a2']);
   });
 
   it('pairs each answer with the preceding user message', () => {
-    expect(chatgpt.question(answer('a1'), document)).toBe('pip install fails on Ubuntu 24.04 with\nerror: externally-managed-environment');
+    expect(chatgpt.question(answer('a1'), document)).toBe('pip install fails on Ubuntu 24.04 with error: externally-managed-environment');
     expect(chatgpt.question(answer('a2'), document)).toBe('How do I read a UTF-8 file on Windows without UnicodeDecodeError?');
   });
 
-  it('extracts prose without code blocks or code-block chrome', () => {
-    const { prose } = chatgpt.extract(answer('a1'));
-    expect(prose).toBe(
+  it('extracts prose without code widgets, their headers or the sr-only role labels', () => {
+    expect(chatgpt.extract(answer('a1')).prose).toBe(
       [
-        'This error comes from PEP 668: Ubuntu marks the system Python as managed by apt.',
-        'Install the venv module:',
-        'Create and activate a virtual environment.',
-        'Install your package with pip install requests.',
-        'Avoid --break-system-packages unless you know what you are doing.',
+        'The externally-managed-environment error occurs because Ubuntu protects its system Python.',
+        'Step-by-step fix',
+        '1. Install the venv module',
+        'Open your terminal and run:',
+        '2. Create and activate a virtual environment',
+        '3. Install your packages',
+        'Now pip install requests works inside the venv.',
       ].join('\n'),
     );
-    expect(prose).not.toContain('Copy code');
-    expect(prose).not.toContain('python3 -m venv');
   });
 
-  it('extracts code blocks with language from language-* and shell detection', () => {
+  it('takes code from data-chatgpt-copy-code and the language from the widget header', () => {
     expect(chatgpt.extract(answer('a1')).codeBlocks).toEqual([
-      { lang: 'bash', code: 'sudo apt install python3-venv', isShell: true },
+      { lang: 'bash', code: 'sudo apt update\nsudo apt install python3-venv -y', isShell: true },
       { lang: 'bash', code: 'python3 -m venv .venv\nsource .venv/bin/activate', isShell: true },
     ]);
     expect(chatgpt.extract(answer('a2')).codeBlocks).toEqual([
@@ -43,39 +43,29 @@ describe('ChatGptAdapter on fixture HTML', () => {
     ]);
   });
 
-  it('takes steps from ordered lists only', () => {
+  it('takes steps from numbered headings', () => {
     expect(chatgpt.extract(answer('a1')).steps).toEqual([
-      'Install the venv module: sudo apt install python3-venv',
-      'Create and activate a virtual environment.',
-      'Install your package with pip install requests.',
+      'Install the venv module',
+      'Create and activate a virtual environment',
+      'Install your packages',
     ]);
     expect(chatgpt.extract(answer('a2')).steps).toEqual([]);
   });
 
-  it('reports generating while the stop button or streaming class is present', () => {
+  it('uses the turn state to tell whether the answer is still being generated', () => {
     const a = answer('a2');
     expect(chatgpt.generating(a, document)).toBe(false);
-
-    const stop = document.createElement('button');
-    stop.setAttribute('data-testid', 'stop-button');
-    document.body.append(stop);
-    expect(chatgpt.generating(a, document)).toBe(true);
-    stop.remove();
-
-    a.content.classList.add(SEL.streaming.slice(1));
+    a.el.closest(SEL.turnState)!.setAttribute(SEL.turnStateAttr, 'in_progress');
     expect(chatgpt.generating(a, document)).toBe(true);
   });
 
-  it('anchors the badge on the answer element', () => {
-    expect(chatgpt.anchor(answer('a1'))).toBe(answer('a1').el);
+  it('anchors the badge on the assistant unit', () => {
+    expect(chatgpt.anchor(answer('a1')).getAttribute(SEL.unitKeyAttr)).toBe('fallback-turn-0:2:assistant');
   });
 
-  it("follows ChatGPT's own theme class over the OS setting", () => {
-    const c = document.documentElement.classList;
-    c.add('dark');
+  it('reads the theme from the renderer, with an <html> theme class taking precedence', () => {
     expect(chatgpt.theme(document)).toBe('dark');
-    c.replace('dark', 'light');
+    document.documentElement.classList.add('light');
     expect(chatgpt.theme(document)).toBe('light');
-    c.remove('light');
   });
 });

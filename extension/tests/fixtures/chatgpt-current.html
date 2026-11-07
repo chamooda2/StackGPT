@@ -1,0 +1,140 @@
+<!--
+  Current chatgpt.com layout (observed 2026-11), trimmed from a structural dump of a real conversation:
+  attributes and nesting kept, hashed utility classes mostly dropped, text shortened.
+  - Inactive conversations stay mounted; only [data-app-shell-active-page="true"] is the open chat.
+  - Units are keyed "<turn>:<index>:<role>"; answers use ChatGPT's DIL renderer.
+  - Code blocks are widgets with the exact code in data-chatgpt-copy-code and the language as header text.
+  - Steps are numbered headings rather than <ol>.
+  The "fallback-turn-0:1:assistant" unit without a message id is a defensive case (not seen in the dump).
+-->
+<div class="contents" data-app-shell-active-page="false">
+  <div data-turn-key="t-old">
+    <div class="group flex flex-col" data-talvt-turn-state="complete">
+      <div data-content-search-unit-key="fallback-turn-0:2:assistant">
+        <div class="group flex min-w-0 flex-col" data-chatgpt-selection-message-id="old-a">
+          <div data-markdown-text-style="assistant-message"><p>An answer from another, inactive conversation.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="contents" data-app-shell-active-page="true">
+  <main>
+    <div data-turn-key="t0">
+      <div data-content-search-turn-key="fallback-turn-0">
+        <div class="group flex flex-col" data-talvt-turn-state="complete">
+          <div class="flex flex-col gap-3">
+            <div class="block-BQZwFn">
+              <h4 class="sr-only" data-conversation-role="user"><span>You said:</span><span class="hidden">You</span></h4>
+              <div class="group/user-message flex flex-col" data-chatgpt-search-unit-key="fallback-turn-0:0:user">
+                <div class="w-full" data-content-search-unit-key="fallback-turn-0:0:user">
+                  <div class="bg-user-message" data-user-message-bubble="true">
+                    <div class="text-size-chat whitespace-pre-wrap" dir="auto">pip install fails on Ubuntu 24.04 with error: externally-managed-environment</div>
+                  </div>
+                  <div class="turn-action-controls"><button aria-label="Copy message"><svg></svg></button><button aria-label="Edit message"><svg></svg></button></div>
+                </div>
+              </div>
+            </div>
+            <div class="block-BQZwFn">
+              <span data-chatgpt-agent-turn-start=""></span>
+              <div data-content-search-unit-key="fallback-turn-0:1:assistant"><div class="text-token-text-secondary">Thought for 4s</div></div>
+              <div data-content-search-unit-key="fallback-turn-0:2:assistant" data-chatgpt-search-unit-key="fallback-turn-0:2:assistant">
+                <h4 class="sr-only" data-conversation-role="assistant"><span>ChatGPT said:</span><span class="hidden">ChatGPT</span></h4>
+                <div>
+                  <div class="group flex min-w-0 flex-col" data-chatgpt-selection-message-id="a1">
+                    <div class="MarkdownRoot-rZKhxa" dir="auto" data-markdown-text-style="assistant-message">
+                      <div class="my-4" data-dil-source-message-id="a1" data-markdown-copy="contents">
+                        <div>
+                          <div></div>
+                          <div class="relative PortalBoundary-TFj9W2 Renderer-ojZscX" data-theme="dark">
+                            <div class="DilRenderer-tB76Jj" dir="auto" data-dil-response="" data-d-direction="col" data-dil-message-id="a1">
+                              <p data-d-text-flow="" data-d-component="text"><span data-d-stream-run="" data-d-text-flow="run">The </span><code data-d-component="code"><span data-d-stream-run="" data-d-text-flow="run">externally-managed-environment</span></code><span data-d-stream-run="" data-d-text-flow="run"> error occurs because Ubuntu protects its system Python.</span></p>
+                              <h2 data-d-text-flow="" data-d-component="title" data-d-size="lg"><span data-d-stream-run="" data-d-text-flow="run">Step-by-step fix</span></h2>
+                              <h3 data-d-text-flow="" data-d-component="title" data-d-size="md"><span data-d-stream-run="" data-d-text-flow="run">1. Install the venv module</span></h3>
+                              <p data-d-text-flow="" data-d-component="text"><span data-d-stream-run="" data-d-text-flow="run">Open your terminal and run:</span></p>
+                              <div data-client-defined-widget="code_block">
+                                <div class="CodeBlock-zu1QM3" data-chatgpt-copy-code="sudo apt update&#10;sudo apt install python3-venv -y">
+                                  <div class="relative Root-iW7ipz w-full" data-code-block="true" data-markdown-copy="code-block" data-theme="dark">
+                                    <div class="flex items-center font-sans" data-markdown-copy="exclude"><svg></svg><div class="min-w-0 truncate flex-1">Bash</div><div class="ms-auto flex items-center"><div data-code-block-controls="true" role="presentation"><button aria-label="Enable word wrap"><svg></svg></button><button aria-label="Copy code"><svg></svg></button></div></div></div>
+                                    <div class="relative"><div class="InlineCodePane-EYx4bd"><div class="relative z-0 flex" dir="ltr"><div class="chatgpt-code-scrollport flex w-full"><pre class="m-0 flex-1 cursor-text"><code><span class="text-codex-syntax-variable">sudo apt update</span><span>
+</span><span class="text-codex-syntax-variable">sudo apt install python3-venv -y</span></code></pre></div></div></div><button aria-label="Scroll to bottom"><svg></svg></button></div>
+                                  </div>
+                                </div>
+                              </div>
+                              <h3 data-d-text-flow="" data-d-component="title" data-d-size="md"><span data-d-stream-run="" data-d-text-flow="run">2. Create and activate a virtual environment</span></h3>
+                              <div data-client-defined-widget="code_block">
+                                <div class="CodeBlock-zu1QM3" data-chatgpt-copy-code="python3 -m venv .venv&#10;source .venv/bin/activate">
+                                  <div class="relative Root-iW7ipz w-full" data-code-block="true" data-markdown-copy="code-block" data-theme="dark">
+                                    <div class="flex items-center font-sans" data-markdown-copy="exclude"><svg></svg><div class="min-w-0 truncate flex-1">Bash</div><div class="ms-auto flex items-center"><div data-code-block-controls="true" role="presentation"><button aria-label="Copy code"><svg></svg></button></div></div></div>
+                                    <div class="relative"><pre class="m-0 flex-1 cursor-text"><code><span>python3 -m venv .venv</span><span>
+</span><span>source .venv/bin/activate</span></code></pre></div>
+                                  </div>
+                                </div>
+                              </div>
+                              <h3 data-d-text-flow="" data-d-component="title" data-d-size="md"><span data-d-stream-run="" data-d-text-flow="run">3. Install your packages</span></h3>
+                              <p data-d-text-flow="" data-d-component="text"><span data-d-stream-run="" data-d-text-flow="run">Now </span><code data-d-component="code"><span data-d-stream-run="" data-d-text-flow="run">pip install requests</span></code><span data-d-stream-run="" data-d-text-flow="run"> works inside the venv.</span></p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="contents"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="actionRow-nqqZbm mt-1.5 flex"><button aria-label="Copy"><svg></svg></button><button aria-label="Rate response"><svg></svg></button></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-turn-key="t1">
+      <div data-content-search-turn-key="fallback-turn-1">
+        <div class="group flex flex-col" data-talvt-turn-state="complete">
+          <div class="flex flex-col gap-3">
+            <div class="block-BQZwFn">
+              <h4 class="sr-only" data-conversation-role="user"><span>You said:</span></h4>
+              <div class="group/user-message flex flex-col" data-chatgpt-search-unit-key="fallback-turn-1:0:user">
+                <div class="w-full" data-content-search-unit-key="fallback-turn-1:0:user">
+                  <div class="bg-user-message" data-user-message-bubble="true">
+                    <div class="text-size-chat whitespace-pre-wrap" dir="auto">How do I read a UTF-8 file on Windows without UnicodeDecodeError?</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="block-BQZwFn">
+              <span data-chatgpt-agent-turn-start=""></span>
+              <div data-content-search-unit-key="fallback-turn-1:2:assistant" data-chatgpt-search-unit-key="fallback-turn-1:2:assistant">
+                <h4 class="sr-only" data-conversation-role="assistant"><span>ChatGPT said:</span></h4>
+                <div>
+                  <div class="group flex min-w-0 flex-col" data-chatgpt-selection-message-id="a2">
+                    <div class="MarkdownRoot-rZKhxa" dir="auto" data-markdown-text-style="assistant-message">
+                      <div class="my-4" data-markdown-copy="contents">
+                        <div class="relative PortalBoundary-TFj9W2" data-theme="dark">
+                          <div class="DilRenderer-tB76Jj" dir="auto" data-dil-response="">
+                            <p data-d-component="text"><span data-d-stream-run="">Pass the encoding explicitly:</span></p>
+                            <div data-client-defined-widget="code_block">
+                              <div class="CodeBlock-zu1QM3" data-chatgpt-copy-code="with open(&quot;data.txt&quot;, encoding=&quot;utf-8&quot;) as f:&#10;    text = f.read()">
+                                <div class="relative Root-iW7ipz w-full" data-code-block="true" data-theme="dark">
+                                  <div class="flex items-center font-sans" data-markdown-copy="exclude"><svg></svg><div class="min-w-0 truncate flex-1">Python</div></div>
+                                  <div class="relative"><pre><code><span>with open("data.txt", encoding="utf-8") as f:</span><span>
+</span><span>    text = f.read()</span></code></pre></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
