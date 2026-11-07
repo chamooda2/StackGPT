@@ -10,7 +10,9 @@ export default defineConfig({
   manifest: {
     name: 'StackGPT',
     description: 'Community evidence for AI answers: has this fix worked for others?',
-    version: '0.1.0',
+    version: '0.2.0',
+    // Holds the anonymous user token for community reports.
+    permissions: ['storage'],
     // Background worker calls the local API; host permission avoids CORS.
     host_permissions: [`${new URL(api).origin}/*`],
   },

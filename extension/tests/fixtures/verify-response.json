@@ -1,81 +1,104 @@
 {
+  "trustStatus": "conflicting", 
   "alignment": {
     "problemId": 41, 
-    "solutionId": 57, 
     "verdict": "matches", 
-    "similarity": 0.812502717599195
+    "similarity": 0.812502717599195, 
+    "solutionId": 57
   }, 
   "query": {
-    "statement": "My Samsung Galaxy A14 won't super fast charge even though I bought a 25W Samsung charger. How do I enable it?", 
-    "errorSigs": [], 
     "env": {
       "os": "android", 
       "clientOs": "windows", 
       "device": "Samsung Galaxy A14"
-    }
+    }, 
+    "statement": "My Samsung Galaxy A14 won't super fast charge even though I bought a 25W Samsung charger. How do I enable it?", 
+    "errorSigs": []
   }, 
   "matches": [
     {
-      "problemId": 41, 
-      "title": "Samsung phone not fast charging with a 25W/45W charger", 
-      "env": {
-        "osVer": "14", 
-        "os": "android"
-      }, 
       "score": 0.03475409836065574, 
-      "domain": "electronics", 
       "source": {
-        "author": "StackGPT curators", 
         "license": "StackGPT PoC curated content; attempts are synthetic", 
         "name": "curated", 
+        "author": "StackGPT curators", 
         "id": "ph-03", 
         "url": null
       }, 
+      "similarity": 0.7475149637425245, 
       "fit": {
         "score": 0.8, 
         "conflicts": []
       }, 
-      "similarity": 0.7475149637425245, 
+      "env": {
+        "os": "android", 
+        "osVer": "14"
+      }, 
+      "problemId": 41, 
+      "domain": "electronics", 
       "solutions": [
         {
-          "answerSimilarity": 0.812502717599195, 
-          "steps": [], 
           "score": null, 
-          "source": {
-            "author": "StackGPT curators", 
-            "license": "StackGPT PoC curated content; attempts are synthetic", 
-            "name": "curated", 
-            "id": "ph-03-s1", 
-            "url": null
-          }, 
-          "body": "Enable the fast charging toggles: Settings > Battery > Charging settings > turn on 'Fast charging' and 'Super fast charging'.", 
-          "outcomes": {
-            "partial": 1, 
-            "lastAttempt": "2026-10-26T00:50:52.993754Z", 
-            "worked": 10, 
-            "failed": 9, 
-            "synthetic": 20
-          }, 
-          "code": null, 
-          "id": 57, 
           "accepted": false, 
+          "conflicts": [
+            "Mostly fails in setups like yours (Samsung Galaxy A14) but works in others"
+          ], 
+          "trust": {
+            "reports": 20, 
+            "synthetic": true, 
+            "reasons": [
+              "Works on Samsung Galaxy S24 (9 of 10) but not on Samsung Galaxy A14 (1 of 10)"
+            ], 
+            "successLower": 0.32047722856190675, 
+            "status": "conflicting"
+          }, 
+          "id": 57, 
+          "body": "Enable the fast charging toggles: Settings > Battery > Charging settings > turn on 'Fast charging' and 'Super fast charging'.", 
+          "code": null, 
           "yourEnv": {
-            "partial": 1, 
             "lastAttempt": null, 
             "worked": 1, 
             "failed": 8, 
+            "partial": 1, 
             "synthetic": 10
           }, 
-          "conflicts": [
-            "Mostly fails in setups like yours (Samsung Galaxy A14) but works in others"
-          ]
+          "outcomes": {
+            "lastAttempt": "2026-10-26T00:50:52.993754Z", 
+            "worked": 10, 
+            "failed": 9, 
+            "partial": 1, 
+            "synthetic": 20
+          }, 
+          "mine": {
+            "outcome": null, 
+            "helpful": null, 
+            "flags": []
+          }, 
+          "flags": {
+            "outdated": 0, 
+            "misleading": 0
+          }, 
+          "steps": [], 
+          "answerSimilarity": 0.812502717599195, 
+          "votes": {
+            "helpful": 0, 
+            "notHelpful": 0
+          }, 
+          "source": {
+            "license": "StackGPT PoC curated content; attempts are synthetic", 
+            "name": "curated", 
+            "author": "StackGPT curators", 
+            "id": "ph-03-s1", 
+            "url": null
+          }
         }
       ], 
+      "title": "Samsung phone not fast charging with a 25W/45W charger", 
       "errorSigs": [], 
       "ranks": {
-        "errorSig": null, 
         "vector": 1, 
-        "text": 1
+        "text": 1, 
+        "errorSig": null
       }
     }
   ]

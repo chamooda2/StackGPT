@@ -37,6 +37,36 @@ export interface Outcomes {
   lastAttempt: string | null;
 }
 
+export type Outcome = 'worked' | 'partial' | 'failed';
+export type FlagKind = 'outdated' | 'misleading';
+export type TrustStatus = 'verified' | 'conflicting' | 'outdated' | 'partial' | 'failing' | 'unverified';
+
+export interface Trust {
+  status: TrustStatus;
+  reasons: string[];
+  successLower: number | null;
+  reports: number;
+  /** Whether seeded demo reports are counted. */
+  synthetic: boolean;
+}
+
+export interface Votes {
+  helpful: number;
+  notHelpful: number;
+}
+
+export interface Flags {
+  outdated: number;
+  misleading: number;
+}
+
+/** The current user's own report, vote and flags. */
+export interface Mine {
+  outcome: Outcome | null;
+  helpful: boolean | null;
+  flags: FlagKind[];
+}
+
 export interface Solution {
   id: number;
   body: string;
@@ -50,6 +80,52 @@ export interface Solution {
   yourEnv: Outcomes | null;
   conflicts: string[];
   answerSimilarity: number | null;
+  trust: Trust;
+  votes: Votes;
+  flags: Flags;
+  mine: Mine;
+}
+
+/** Returned by every community write: the solution's updated evidence. */
+export interface SolutionSummary {
+  id: number;
+  problemId: number;
+  problemTitle: string;
+  body: string;
+  steps: string[];
+  code: string | null;
+  source: Source;
+  outcomes: Outcomes;
+  trust: Trust;
+  votes: Votes;
+  flags: Flags;
+  mine: Mine;
+}
+
+export interface AttemptRequest {
+  solutionId: number;
+  outcome: Outcome;
+  env?: Env;
+  note?: string;
+}
+
+export interface VoteRequest {
+  solutionId: number;
+  helpful: boolean;
+}
+
+export interface FlagRequest {
+  solutionId: number;
+  kind: FlagKind;
+}
+
+/** A fix for an existing problem (problemId) or a new one (problem). */
+export interface SubmitRequest {
+  problemId?: number;
+  problem?: { title: string; body: string };
+  body: string;
+  steps?: string[];
+  code?: string;
 }
 
 export interface Match {
@@ -80,8 +156,25 @@ export interface VerifyResponse {
   query: { statement: string; errorSigs: string[]; env: Env };
   /** null when no answer text was sent. */
   alignment: Alignment | null;
+  /** Trust status of the solution the answer aligned with; null when it matched none. */
+  trustStatus: TrustStatus | null;
   matches: Match[];
 }
 
-export type Msg = { type: 'verify'; req: VerifyRequest };
+export type Msg =
+  | { type: 'verify'; req: VerifyRequest }
+  | { type: 'attempt'; req: AttemptRequest }
+  | { type: 'vote'; req: VoteRequest }
+  | { type: 'flag'; req: FlagRequest }
+  | { type: 'submit'; req: SubmitRequest };
+
 export type Reply<T> = { ok: true; data: T } | { ok: false; error: string };
+
+/** What the panel can do; implemented by the content script via the background worker. */
+export interface Actions {
+  verify(): Promise<{ req: VerifyRequest; resp: VerifyResponse }>;
+  attempt(r: AttemptRequest): Promise<SolutionSummary>;
+  vote(r: VoteRequest): Promise<SolutionSummary>;
+  flag(r: FlagRequest): Promise<SolutionSummary>;
+  submit(r: SubmitRequest): Promise<SolutionSummary>;
+}

@@ -11,6 +11,8 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import dev.stackgpt.api.community.SolutionStats;
+import dev.stackgpt.api.community.SolutionStats.Stats;
 import dev.stackgpt.api.context.ContextMatcher.Att;
 import dev.stackgpt.api.embed.Embedder;
 import dev.stackgpt.api.verify.Dto.Source;
@@ -18,8 +20,8 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Loads candidate problems, their solutions (with similarity to the AI answer) and attempts.
- * Three queries; O(h + s + a) rows for h problems, s solutions, a attempts.
+ * Loads candidate problems, their solutions (with similarity to the AI answer) and community stats.
+ * Two queries plus SolutionStats; O(h + s + a) rows for h problems, s solutions, a attempts.
  */
 @Component
 public class MatchLoader {
@@ -30,21 +32,30 @@ public class MatchLoader {
 			List<String> errorSigs, Source source, List<SolRow> solutions) {}
 
 	public record SolRow(long id, String body, List<String> steps, String code, Integer score, boolean accepted,
-			Source source, Double answerSimilarity, List<Att> attempts) {}
+			Source source, Double answerSimilarity, Stats stats) {
+		public List<Att> attempts() {
+			return stats.attempts();
+		}
+	}
 
 	private final JdbcTemplate jdbc;
 	private final ObjectMapper json;
+	private final SolutionStats stats;
 
-	public MatchLoader(JdbcTemplate jdbc, ObjectMapper json) {
+	public MatchLoader(JdbcTemplate jdbc, ObjectMapper json, SolutionStats stats) {
 		this.jdbc = jdbc;
 		this.json = json;
+		this.stats = stats;
 	}
 
-	/** @param a the AI answer's embedding, or null */
-	public Map<Long, Row> load(List<Long> problemIds, float[] q, float[] a) {
+	/**
+	 * @param a    the AI answer's embedding, or null
+	 * @param user requesting user (for their own reports), or null
+	 */
+	public Map<Long, Row> load(List<Long> problemIds, float[] q, float[] a, Long user) {
 		if (problemIds.isEmpty()) return Map.of();
 		Long[] ids = problemIds.toArray(Long[]::new);
-		Map<Long, List<SolRow>> sols = solutions(ids, a);
+		Map<Long, List<SolRow>> sols = solutions(ids, a, user);
 		Map<Long, Row> out = new HashMap<>();
 		jdbc.query(c -> {
 			var ps = c.prepareStatement("""
@@ -63,11 +74,13 @@ public class MatchLoader {
 		return out;
 	}
 
-	private Map<Long, List<SolRow>> solutions(Long[] problemIds, float[] a) {
+	private record Base(long id, String body, List<String> steps, String code, Integer score, boolean accepted,
+			Source source, Double answerSimilarity) {}
+
+	private Map<Long, List<SolRow>> solutions(Long[] problemIds, float[] a, Long user) {
 		Map<Long, List<SolRow>> out = new HashMap<>();
-		Map<Long, List<Att>> atts = new HashMap<>();
 		List<long[]> order = new ArrayList<>();
-		Map<Long, SolRow> rows = new HashMap<>();
+		Map<Long, Base> rows = new HashMap<>();
 		jdbc.query(c -> {
 			var ps = c.prepareStatement("""
 					select id, problem_id, body, steps::text, code, score, is_accepted, source, source_id, source_url, author, license,
@@ -82,23 +95,16 @@ public class MatchLoader {
 			long id = rs.getLong("id");
 			int sc = rs.getInt("score");
 			Integer score = rs.wasNull() ? null : sc;
-			rows.put(id, new SolRow(id, rs.getString("body"), json.readValue(rs.getString("steps"), LIST),
-					rs.getString("code"), score, rs.getBoolean("is_accepted"), source(rs), dbl(rs, "ans_sim"),
-					atts.computeIfAbsent(id, k -> new ArrayList<>())));
+			rows.put(id, new Base(id, rs.getString("body"), json.readValue(rs.getString("steps"), LIST),
+					rs.getString("code"), score, rs.getBoolean("is_accepted"), source(rs), dbl(rs, "ans_sim")));
 			order.add(new long[] { rs.getLong("problem_id"), id });
 		});
-		if (rows.isEmpty()) return out;
-		jdbc.query(c -> {
-			var ps = c.prepareStatement("""
-					select solution_id, outcome, synthetic, env::text, created_at
-					from attempts where solution_id = any(?)""");
-			ps.setArray(1, c.createArrayOf("bigint", rows.keySet().toArray(Long[]::new)));
-			return ps;
-		}, rs -> {
-			atts.get(rs.getLong("solution_id")).add(new Att(rs.getString("outcome"), rs.getBoolean("synthetic"),
-					json.readValue(rs.getString("env"), MAP), rs.getTimestamp("created_at").toInstant()));
-		});
-		for (long[] o : order) out.computeIfAbsent(o[0], k -> new ArrayList<>()).add(rows.get(o[1]));
+		Map<Long, Stats> st = stats.load(rows.keySet(), user);
+		for (long[] o : order) {
+			Base b = rows.get(o[1]);
+			out.computeIfAbsent(o[0], k -> new ArrayList<>()).add(new SolRow(b.id(), b.body(), b.steps(), b.code(),
+					b.score(), b.accepted(), b.source(), b.answerSimilarity(), st.get(b.id())));
+		}
 		return out;
 	}
 

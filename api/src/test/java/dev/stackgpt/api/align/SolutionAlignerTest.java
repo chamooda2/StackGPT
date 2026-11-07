@@ -19,7 +19,7 @@ class SolutionAlignerTest {
 	final SolutionAligner al = new SolutionAligner();
 
 	static Solution sol(long id, Double sim) {
-		return new Solution(id, "b", List.of(), null, null, false, null, null, null, List.of(), sim);
+		return new Solution(id, "b", List.of(), null, null, false, null, null, null, List.of(), sim, null, null, null, null);
 	}
 
 	static Match match(long id, double sim, Solution... s) {

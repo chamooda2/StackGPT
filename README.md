@@ -67,6 +67,31 @@ All chatgpt.com DOM assumptions live in `extension/src/lib/chatgpt.ts`.
 - Matches below 0.70 question similarity are dropped unless an error signature matched exactly.
 - Thresholds were calibrated on the seeded corpus; `VerifyEvalTest` prints the similarities behind them.
 
+## Community reports and trust (build step 5)
+
+| Endpoint | Body | Notes |
+|---|---|---|
+| `POST /v1/attempts` | `{solutionId, outcome: worked\|partial\|failed, env?, note?}` | one per user per solution; posting again replaces it |
+| `POST /v1/votes` | `{solutionId, helpful}` | helpfulness, kept separate from outcomes |
+| `POST /v1/flags` | `{solutionId, kind: outdated\|misleading}` | once per user and kind |
+| `POST /v1/solutions` | `{problemId \| problem:{title, body}, body, steps?, code?}` | embedded immediately, so searchable at once |
+| `GET /v1/solutions/{id}` | | |
+
+Writes need `X-StackGPT-Token`: a random 64-hex token the extension creates on first use and keeps in
+`chrome.storage.local`. The API stores only its SHA-256. Every write returns the solution's updated
+outcomes, trust, votes, flags and the caller's own report.
+
+**Trust status** per solution (partial counts as half a success), first rule that applies:
+`unverified` (< 5 reports) → `outdated` (≥ 3 outdated flags, or worked before but ≥ 60% of the last 180
+days' reports failed, or no success in 2 years) → `conflicting` (one OS / OS version / device / package
+version segment works ≥ 70%, another ≤ 30%, each ≥ 3 reports) → `verified` (Wilson 95% lower bound ≥ 0.7
+and a success within a year) → `failing` (Wilson upper bound < 0.5) → `partial`. Seeded synthetic reports
+are counted but always reported (`trust.synthetic`, "demo data" in the panel).
+
+In the panel each fix has Worked / Partly / Didn't work (+ optional note), Helpful, and Flag buttons.
+"Did ChatGPT's answer work?" reports on the fix the answer matches; for a novel answer it first shares
+the question and answer as a new fix (the button says so).
+
 ### API response
 
 `/v1/verify` returns the extracted query (statement, error signatures, env facets merged with `envHints`) and

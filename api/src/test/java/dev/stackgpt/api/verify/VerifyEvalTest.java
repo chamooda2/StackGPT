@@ -14,6 +14,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import dev.stackgpt.api.align.SolutionAligner;
+import dev.stackgpt.api.community.SolutionStats;
+import dev.stackgpt.api.trust.TrustScorer;
 import dev.stackgpt.api.context.ContextMatcher;
 import dev.stackgpt.api.embed.LocalEmbedder;
 import dev.stackgpt.api.extract.RuleExtractor;
@@ -46,12 +48,14 @@ class VerifyEvalTest {
 			assumeTrue(false, "DB not reachable: " + e.getMessage());
 		}
 		jdbc = new JdbcTemplate(new DriverManagerDataSource(URL, "stackgpt", "stackgpt"));
+		var json = JsonMapper.builder().build();
 		svc = new VerifyService(new RuleExtractor(), new LocalEmbedder(), new Retriever(jdbc),
-				new MatchLoader(jdbc, JsonMapper.builder().build()), new ContextMatcher(), new SolutionAligner());
+				new MatchLoader(jdbc, json, new SolutionStats(jdbc, json)), new ContextMatcher(), new SolutionAligner(),
+				new TrustScorer());
 	}
 
 	static VerifyResponse run(String q, Answer a) {
-		return svc.verify(new VerifyRequest("chatgpt", q, a, Map.of("clientOs", "windows")));
+		return svc.verify(new VerifyRequest("chatgpt", q, a, Map.of("clientOs", "windows")), null);
 	}
 
 	static String sid(Long problemOrSolutionId, String table) {
@@ -146,6 +150,28 @@ class VerifyEvalTest {
 		var s = top.solutions().get(0);
 		assertThat(s.yourEnv().failed()).isEqualTo(8);
 		assertThat(s.conflicts()).anyMatch(c -> c.startsWith("Mostly fails in setups like yours"));
+		assertThat(s.trust().status()).isEqualTo("conflicting");
+		assertThat(r.trustStatus()).isEqualTo("conflicting");
+	}
+
+	@Test
+	void seededEvidenceProfilesGetTheirTrustStatus() {
+		// One solution per seeded evidence profile (db/src/evidence.ts).
+		var expected = Map.of("py-002-s1", "verified", "py-002-s2", "partial", "ph-03-s1", "conflicting",
+				"py-003-s2", "outdated", "nw-08-s1", "failing", "gt-003-s2", "unverified");
+		var seen = new java.util.HashMap<String, String>();
+		for (String q : List.of("pip install fails on Ubuntu 24.04 with error: externally-managed-environment",
+				"My Samsung Galaxy A14 won't super fast charge with the 25W charger on Android 14",
+				"import pandas crashes: A module that was compiled using NumPy 1.x cannot be run in NumPy 2.0",
+				"Google Home says my Chromecast is an untrusted device and I can't cast anymore",
+				"git push rejected: Updates were rejected because the tip of your current branch is behind"))
+			for (Match m : run(q, null).matches())
+				for (var s : m.solutions())
+					if (expected.containsKey(s.source().id())) {
+						seen.put(s.source().id(), s.trust().status());
+						System.out.printf("%-10s %-12s %s%n", s.source().id(), s.trust().status(), s.trust().reasons());
+					}
+		assertThat(seen).isEqualTo(expected);
 	}
 
 	@Test

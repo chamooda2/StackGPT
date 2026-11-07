@@ -23,8 +23,11 @@ public final class Dto {
 
 	public record CodeBlock(String lang, String code, boolean isShell) {}
 
-	/** alignment is null when no answer text was sent. */
-	public record VerifyResponse(Extraction query, Alignment alignment, List<Match> matches) {}
+	/**
+	 * alignment is null when no answer text was sent; trustStatus is the aligned solution's trust status, null when
+	 * the answer matched no known solution.
+	 */
+	public record VerifyResponse(Extraction query, Alignment alignment, String trustStatus, List<Match> matches) {}
 
 	/** verdict: matches | partial | novel; ids/similarity null when nothing related was close enough. */
 	public record Alignment(String verdict, Long problemId, Long solutionId, Double similarity) {}
@@ -45,8 +48,29 @@ public final class Dto {
 
 	/** yourEnv: outcomes reported from setups like the user's, null when none are comparable. */
 	public record Solution(long id, String body, List<String> steps, String code, Integer score, boolean accepted,
-			Source source, Outcomes outcomes, Outcomes yourEnv, List<String> conflicts, Double answerSimilarity) {}
+			Source source, Outcomes outcomes, Outcomes yourEnv, List<String> conflicts, Double answerSimilarity,
+			Trust trust, Votes votes, Flags flags, Mine mine) {}
 
 	/** Raw attempt counts; synthetic = how many of them are seeded demo data. */
 	public record Outcomes(int worked, int partial, int failed, int synthetic, Instant lastAttempt) {}
+
+	/**
+	 * status: verified | conflicting | outdated | partial | failing | unverified. successLower: Wilson 95% lower
+	 * bound of the success rate (partial = half). synthetic: whether seeded demo reports are counted.
+	 */
+	public record Trust(String status, List<String> reasons, Double successLower, int reports, boolean synthetic) {}
+
+	/** Helpfulness, kept separate from whether the fix worked. */
+	public record Votes(int helpful, int notHelpful) {}
+
+	public record Flags(int outdated, int misleading) {}
+
+	/** The requesting user's own report, vote and flags (all null/empty for anonymous reads). */
+	public record Mine(String outcome, Boolean helpful, List<String> flags) {
+		public static final Mine NONE = new Mine(null, null, List.of());
+	}
+
+	/** One solution with its problem, as returned by GET /v1/solutions/{id} and the community write endpoints. */
+	public record SolutionSummary(long id, long problemId, String problemTitle, String body, List<String> steps,
+			String code, Source source, Outcomes outcomes, Trust trust, Votes votes, Flags flags, Mine mine) {}
 }

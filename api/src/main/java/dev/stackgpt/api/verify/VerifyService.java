@@ -17,6 +17,8 @@ import dev.stackgpt.api.extract.Extraction;
 import dev.stackgpt.api.extract.ProblemExtractor;
 import dev.stackgpt.api.retrieve.Retriever;
 import dev.stackgpt.api.retrieve.Rrf;
+import dev.stackgpt.api.trust.TrustScorer;
+import dev.stackgpt.api.verify.Dto.Alignment;
 import dev.stackgpt.api.verify.Dto.Fit;
 import dev.stackgpt.api.verify.Dto.Match;
 import dev.stackgpt.api.verify.Dto.Outcomes;
@@ -27,7 +29,7 @@ import dev.stackgpt.api.verify.Dto.VerifyResponse;
 
 /**
  * extract -> embed question (+ answer) -> hybrid retrieve -> RRF fuse -> load candidates
- * -> drop unrelated -> context rerank -> align answer with stored solutions.
+ * -> drop unrelated -> context rerank -> trust per solution -> align answer with stored solutions.
  */
 @Service
 public class VerifyService {
@@ -51,18 +53,21 @@ public class VerifyService {
 	private final MatchLoader loader;
 	private final ContextMatcher ctx;
 	private final SolutionAligner aligner;
+	private final TrustScorer trust;
 
 	public VerifyService(ProblemExtractor ex, Embedder emb, Retriever ret, MatchLoader loader, ContextMatcher ctx,
-			SolutionAligner aligner) {
+			SolutionAligner aligner, TrustScorer trust) {
 		this.ex = ex;
 		this.emb = emb;
 		this.ret = ret;
 		this.loader = loader;
 		this.ctx = ctx;
 		this.aligner = aligner;
+		this.trust = trust;
 	}
 
-	public VerifyResponse verify(VerifyRequest r) {
+	/** @param user requesting user (to include their own reports), or null */
+	public VerifyResponse verify(VerifyRequest r, Long user) {
 		Extraction x = ex.extract(r.question());
 		Map<String, Object> env = new LinkedHashMap<>(x.env());
 		if (r.envHints() != null) env.putAll(r.envHints());
@@ -71,30 +76,36 @@ public class VerifyService {
 		float[] a = at.isBlank() ? null : emb.embed(at);
 
 		List<Rrf.Scored> hits = Rrf.fuse(ret.search(x.statement(), q, x.errorSigs()).all()).stream().limit(CANDIDATES).toList();
-		Map<Long, MatchLoader.Row> rows = loader.load(hits.stream().map(Rrf.Scored::id).toList(), q, a);
+		Map<Long, MatchLoader.Row> rows = loader.load(hits.stream().map(Rrf.Scored::id).toList(), q, a, user);
+		Instant now = Instant.now();
 		List<Match> ms = hits.stream()
-				.map(h -> match(h, rows.get(h.id()), env))
+				.map(h -> match(h, rows.get(h.id()), env, now))
 				.filter(m -> (m.similarity() != null && m.similarity() >= MIN_SIM) || m.ranks().errorSig() != null)
 				.sorted(Comparator.comparingDouble(Match::score).reversed())
 				.limit(TOP).toList();
-		return new VerifyResponse(new Extraction(x.statement(), x.errorSigs(), env), a == null ? null : aligner.align(ms), ms);
+		Alignment al = a == null ? null : aligner.align(ms);
+		String status = al == null || al.solutionId() == null || al.verdict().equals(SolutionAligner.NOVEL) ? null
+				: ms.stream().flatMap(m -> m.solutions().stream()).filter(s -> s.id() == al.solutionId())
+						.map(s -> s.trust().status()).findFirst().orElse(null);
+		return new VerifyResponse(new Extraction(x.statement(), x.errorSigs(), env), al, status, ms);
 	}
 
-	Match match(Rrf.Scored h, MatchLoader.Row p, Map<String, Object> env) {
+	Match match(Rrf.Scored h, MatchLoader.Row p, Map<String, Object> env, Instant now) {
 		var pf = ctx.problem(env, p.env());
 		double score = h.score() * (1 + BETA * (pf.score() - ContextMatcher.NEUTRAL)) * (pf.conflicts().isEmpty() ? 1 : CONFLICT_PENALTY);
 		List<Solution> sols = p.solutions().stream().map(s -> {
 			var sf = ctx.solution(env, s.attempts());
+			var st = s.stats();
 			return new Solution(s.id(), s.body(), s.steps(), s.code(), s.score(), s.accepted(), s.source(),
 					outcomes(s.attempts()), sf.yourEnv() == null ? null : outcomes(sf.yourEnv()), sf.conflicts(),
-					s.answerSimilarity());
+					s.answerSimilarity(), trust.score(s.attempts(), st.flags(), now), st.votes(), st.flags(), st.mine());
 		}).sorted(Comparator.comparing(s -> !s.conflicts().isEmpty())).toList();
 		return new Match(p.id(), p.domain(), p.title(), score, p.similarity(),
 				new Ranks(rank(h, 0), rank(h, 1), rank(h, 2)), new Fit(pf.score(), pf.conflicts()), p.env(),
 				p.errorSigs(), p.source(), sols);
 	}
 
-	static Outcomes outcomes(List<Att> atts) {
+	public static Outcomes outcomes(List<Att> atts) {
 		int w = 0, p = 0, f = 0, syn = 0;
 		Instant last = null;
 		for (Att a : atts) {

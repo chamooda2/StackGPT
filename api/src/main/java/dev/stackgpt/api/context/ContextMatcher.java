@@ -155,7 +155,7 @@ public class ContextMatcher {
 	}
 
 	/** Lowercase, without brand names and parentheticals: "Samsung Galaxy A14 (4G)" -> "galaxy a14". */
-	static String device(String d) {
+	public static String device(String d) {
 		String s = PAREN.matcher(d.toLowerCase(Locale.ROOT)).replaceAll(" ");
 		return BRANDS.matcher(s).replaceAll(" ").replaceAll("\\s+", " ").trim();
 	}
@@ -192,14 +192,14 @@ public class ContextMatcher {
 		return l.stream().mapToInt(Integer::intValue).toArray();
 	}
 
-	static String str(Map<String, ?> m, String k) {
+	public static String str(Map<String, ?> m, String k) {
 		Object v = m == null ? null : m.get(k);
 		if (v == null) return null;
 		String s = v.toString().trim().toLowerCase(Locale.ROOT);
 		return s.isEmpty() ? null : s;
 	}
 
-	static Map<String, String> pkg(Map<String, ?> m) {
+	public static Map<String, String> pkg(Map<String, ?> m) {
 		Object v = m == null ? null : m.get("pkg");
 		if (!(v instanceof Map<?, ?> p)) return Map.of();
 		Map<String, String> o = new HashMap<>();
